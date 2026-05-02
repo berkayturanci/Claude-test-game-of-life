@@ -160,4 +160,5 @@ function updateStats() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
-init();
+// Export init so landing.js can call it after the transition completes.
+export { init };
