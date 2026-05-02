@@ -17,6 +17,7 @@ Then open http://localhost:8080.
 ## Test
 
 ```bash
+npm ci
 npm test
 ```
 
