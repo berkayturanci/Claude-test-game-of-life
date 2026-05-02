@@ -305,6 +305,15 @@ class OverpopDemo extends CardDemo {
   buildFrames() { return buildOverpopFrames(); }
 }
 
+class ReproductionDemo extends CardDemo {
+  buildFrames() {
+    const before = new Uint8Array(25);
+    [6, 8, 16].forEach(i => { before[i] = 1; });
+    const after = stepCard5x5(before);
+    return [before, after, after, before];
+  }
+}
+
 // ─── Pattern type demos ───────────────────────────────────────────────────────
 
 const DEMO_STILL = [[0,0],[1,0],[0,1],[1,1]]; // Block (still life)
@@ -370,6 +379,95 @@ class PatternDemo {
   stop() { cancelAnimationFrame(this.rafId); this.rafId = null; }
 }
 
+// ─── CTA background: Gosper Glider Gun ───────────────────────────────────────
+
+const GOSPER_GUN = [
+  [0,4],[0,5],[1,4],[1,5],
+  [10,4],[10,5],[10,6],[11,3],[11,7],[12,2],[12,8],[13,2],[13,8],
+  [14,5],[15,3],[15,7],[16,4],[16,5],[16,6],[17,5],
+  [20,2],[20,3],[20,4],[21,2],[21,3],[21,4],[22,1],[22,5],
+  [24,0],[24,1],[24,5],[24,6],
+  [34,2],[34,3],[35,2],[35,3],
+];
+
+class CtaGunSim {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas?.getContext('2d');
+    this.game = new GameOfLife(70, 40);
+    this.rafId = null;
+    this.last = 0;
+    this.generation = 0;
+    this._resizeHandler = () => this._resize();
+  }
+
+  start() {
+    if (!this.canvas || !this.ctx) return;
+    this._seed();
+    this._resize();
+    window.addEventListener('resize', this._resizeHandler);
+    this.rafId = requestAnimationFrame(ts => this._loop(ts));
+  }
+
+  stop() {
+    cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    window.removeEventListener('resize', this._resizeHandler);
+  }
+
+  _seed() {
+    this.game.clear();
+    const offC = 2;
+    const offR = 8;
+    for (const [c, r] of GOSPER_GUN) this.game.set(c + offC, r + offR, 1);
+    this.generation = 0;
+  }
+
+  _resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.canvas.offsetWidth;
+    const h = this.canvas.offsetHeight;
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  _draw() {
+    const { ctx, canvas, game } = this;
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    const cell = Math.min(w / game.cols, h / game.rows) * 0.85;
+    const offX = (w - game.cols * cell) / 2;
+    const offY = (h - game.rows * cell) / 2;
+    const accent = css('--accent') || '#4ade80';
+    const cyan = css('--cyan') || '#22d3ee';
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = accent;
+    ctx.shadowColor = cyan;
+    ctx.shadowBlur = 8;
+    for (let row = 0; row < game.rows; row++) {
+      for (let col = 0; col < game.cols; col++) {
+        if (game.grid[row * game.cols + col]) {
+          ctx.fillRect(offX + col * cell + 1, offY + row * cell + 1, cell - 1.5, cell - 1.5);
+        }
+      }
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  _loop(ts) {
+    if (this.rafId === null) return;
+    this.rafId = requestAnimationFrame(nextTs => this._loop(nextTs));
+    if (ts - this.last < 100) return;
+    this.last = ts;
+    this.game.step();
+    this.generation++;
+    if (this.generation > 300) this._seed();
+    this._draw();
+  }
+}
+
 // ─── Landing screen orchestrator ─────────────────────────────────────────────
 
 export function initLanding(onPlay) {
@@ -386,17 +484,12 @@ export function initLanding(onPlay) {
     new UnderpopDemo(document.getElementById('card-canvas-1')),
     new SurvivalDemo(document.getElementById('card-canvas-2')),
     new OverpopDemo(document.getElementById('card-canvas-3')),
+    new ReproductionDemo(document.getElementById('card-canvas-4')),
   ];
   demos.forEach(d => d.start());
 
-  // Pattern type demos
-  const patternDemos = [
-    new PatternDemo(document.getElementById('demo-canvas-1'), DEMO_STILL, 10, 10,  8),
-    new PatternDemo(document.getElementById('demo-canvas-2'), DEMO_OSCIL, 10, 10,  8,  5),
-    new PatternDemo(document.getElementById('demo-canvas-3'), DEMO_SHIP,  16, 16,  5),
-    new PatternDemo(document.getElementById('demo-canvas-4'), DEMO_GUN,   50, 20,  4,  8),
-  ];
-  patternDemos.forEach(d => d.start());
+  const ctaSim = new CtaGunSim(document.getElementById('cta-canvas'));
+  ctaSim.start();
 
   // Play button → transition
   const startGame = () => {
@@ -420,7 +513,7 @@ export function initLanding(onPlay) {
       // Stop background animation to save CPU
       bgSim.stop();
       demos.forEach(d => d.stop());
-      patternDemos.forEach(d => d.stop());
+      ctaSim.stop();
 
       // Hide landing so game canvas can resize correctly
       landing.style.display = 'none';
