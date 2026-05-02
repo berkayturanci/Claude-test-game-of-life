@@ -296,6 +296,71 @@ class OverpopDemo extends CardDemo {
   buildFrames() { return buildOverpopFrames(); }
 }
 
+// ─── Pattern type demos ───────────────────────────────────────────────────────
+
+const DEMO_STILL = [[0,0],[1,0],[0,1],[1,1]]; // Block (still life)
+const DEMO_OSCIL = [[0,0],[1,0],[2,0]];        // Blinker (oscillator)
+const DEMO_SHIP  = [[1,0],[2,1],[0,2],[1,2],[2,2]]; // Glider (spaceship)
+const DEMO_GUN   = [
+  [24,0],[22,1],[24,1],[12,2],[13,2],[20,2],[21,2],[34,2],[35,2],
+  [11,3],[15,3],[20,3],[21,3],[34,3],[35,3],[0,4],[1,4],[10,4],[16,4],[20,4],[21,4],
+  [0,5],[1,5],[10,5],[14,5],[16,5],[17,5],[22,5],[24,5],[10,6],[16,6],[24,6],
+  [11,7],[15,7],[12,8],[13,8],
+]; // Gosper Glider Gun
+
+class PatternDemo {
+  constructor(canvas, cells, cols, rows, cellPx, fps = 10) {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width        = cols * cellPx * dpr;
+    canvas.height       = rows * cellPx * dpr;
+    canvas.style.width  = cols * cellPx + 'px';
+    canvas.style.height = rows * cellPx + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    this.ctx    = ctx;
+    this.cellPx = cellPx;
+    this.fps    = fps;
+    this.rafId  = null;
+    this.game   = new GameOfLife(cols, rows);
+
+    const maxC = cells.reduce((m, [c])   => Math.max(m, c), 0);
+    const maxR = cells.reduce((m, [, r]) => Math.max(m, r), 0);
+    const offC = Math.floor((cols - maxC - 1) / 2);
+    const offR = Math.floor((rows - maxR - 1) / 2);
+    for (const [c, r] of cells) {
+      const gc = offC + c, gr = offR + r;
+      if (gc >= 0 && gc < cols && gr >= 0 && gr < rows) this.game.set(gc, gr, 1);
+    }
+    this._draw();
+  }
+
+  _draw() {
+    const { ctx, game, cellPx } = this;
+    const { cols, rows } = game;
+    ctx.fillStyle = css('--dead') || '#0f172a';
+    ctx.fillRect(0, 0, cols * cellPx, rows * cellPx);
+    ctx.fillStyle = css('--accent') || '#4ade80';
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        if (game.grid[r * cols + c])
+          ctx.fillRect(c * cellPx + 0.5, r * cellPx + 0.5, cellPx - 1, cellPx - 1);
+  }
+
+  start() {
+    let last = 0;
+    const ms = 1000 / this.fps;
+    const tick = ts => {
+      if (this.rafId === null) return;
+      this.rafId = requestAnimationFrame(tick);
+      if (ts - last >= ms) { this.game.step(); this._draw(); last = ts; }
+    };
+    this.rafId = requestAnimationFrame(tick);
+  }
+
+  stop() { cancelAnimationFrame(this.rafId); this.rafId = null; }
+}
+
 // ─── Landing screen orchestrator ─────────────────────────────────────────────
 
 export function initLanding(onPlay) {
@@ -314,6 +379,15 @@ export function initLanding(onPlay) {
     new OverpopDemo(document.getElementById('card-canvas-3')),
   ];
   demos.forEach(d => d.start());
+
+  // Pattern type demos
+  const patternDemos = [
+    new PatternDemo(document.getElementById('demo-canvas-1'), DEMO_STILL, 10, 10,  8),
+    new PatternDemo(document.getElementById('demo-canvas-2'), DEMO_OSCIL, 10, 10,  8,  5),
+    new PatternDemo(document.getElementById('demo-canvas-3'), DEMO_SHIP,  16, 16,  5),
+    new PatternDemo(document.getElementById('demo-canvas-4'), DEMO_GUN,   50, 20,  4,  8),
+  ];
+  patternDemos.forEach(d => d.start());
 
   // Play button → transition
   playBtn.addEventListener('click', () => {
@@ -337,6 +411,7 @@ export function initLanding(onPlay) {
       // Stop background animation to save CPU
       bgSim.stop();
       demos.forEach(d => d.stop());
+      patternDemos.forEach(d => d.stop());
 
       // Hide landing so game canvas can resize correctly
       landing.style.display = 'none';
