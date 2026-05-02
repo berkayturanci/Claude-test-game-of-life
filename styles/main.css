@@ -9,6 +9,9 @@
   --muted:   oklch(0.55 0.04 195);
   --accent:  oklch(0.75 0.22 145);   /* neon green */
   --cyan:    oklch(0.75 0.18 195);   /* neon cyan  */
+  --cell-sparse:  rgb(0, 255, 160);
+  --cell-stable:  rgb(0, 237, 207);
+  --cell-crowded: rgb(0, 220, 255);
   --dead:    #050a0e;
   --grid:    oklch(0.18 0.05 195);
   --btn-h:   44px;
