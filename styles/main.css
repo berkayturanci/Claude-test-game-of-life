@@ -1,0 +1,194 @@
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --bg:      #0f172a;   /* slate-900  – page background                        */
+  --surface: #1e293b;   /* slate-800  – header / controls background            */
+  --border:  #334155;   /* slate-700  – dividers                                */
+  --text:    #f1f5f9;   /* slate-100  – primary text                            */
+  --muted:   #94a3b8;   /* slate-400  – secondary text                          */
+  --accent:  #4ade80;   /* green-400  – live cells, active state, highlights     */
+  --dead:    #0f172a;   /* canvas dead-cell colour (matches --bg)                */
+  --grid:    #1e293b;   /* canvas grid-line colour (matches --surface)           */
+  --btn-h:   44px;      /* minimum touch-target height (Apple HIG)              */
+  --radius:  8px;
+}
+
+/* ── Reset / base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;           /* prevent page scroll; the app is fixed-viewport */
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 14px;
+  -webkit-text-size-adjust: 100%;  /* prevent iOS font scaling on rotation     */
+}
+
+/* ── App shell ─────────────────────────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;             /* dynamic viewport height – handles iOS Safari bar */
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 44px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+header h1 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stats span { white-space: nowrap; }
+.stats b    { color: var(--text); }
+
+/* ── Canvas wrapper ────────────────────────────────────────────────────────── */
+#canvas-wrap {
+  flex: 1 1 0;
+  overflow: hidden;           /* canvas fills this exactly; no scroll            */
+  min-height: 0;
+}
+
+#game-canvas {
+  display: block;
+  touch-action: none;         /* disable browser pan/zoom so touch events fire   */
+  cursor: crosshair;
+}
+
+/* ── Controls bar ──────────────────────────────────────────────────────────── */
+#controls {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.btn-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-h);
+  min-width: var(--btn-h);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+button:active,
+button.active {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg));
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Play button is wider and more prominent */
+#btn-play {
+  min-width: 56px;
+  font-size: 18px;
+}
+
+/* ── Speed row ─────────────────────────────────────────────────────────────── */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.speed-row label {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+#speed-range {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+#speed-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+#speed-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+#speed-label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 44px;
+  text-align: right;
+}
+
+/* ── Desktop tweaks (landscape or wide screen) ─────────────────────────────── */
+@media (min-width: 600px) {
+  header h1 { font-size: 15px; }
+
+  #controls {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .btn-row  { gap: 8px; }
+  .speed-row { flex: 1; gap: 12px; }
+}
