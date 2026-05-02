@@ -192,3 +192,185 @@ button.active {
   .btn-row  { gap: 8px; }
   .speed-row { flex: 1; gap: 12px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Landing / Intro screen
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper ────────────────────────────────────────────────────────────────── */
+#landing {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;             /* allow scroll on short/landscape viewports */
+  overscroll-behavior: contain; /* prevent scroll bleeding to the page behind */
+
+  /* Fade transition — triggered by .landing--fade-out */
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+#landing.landing--fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Background canvas ──────────────────────────────────────────────────────── */
+#landing-bg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0.15;
+  pointer-events: none;        /* let touches pass through to scrollable content  */
+}
+
+/* ── Content card (sits above background) ───────────────────────────────────── */
+.landing-content {
+  position: relative;        /* above #landing-bg */
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 32px 20px 36px;
+  max-width: 860px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Title ──────────────────────────────────────────────────────────────────── */
+.landing-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--accent);
+  text-shadow:
+    0 0 8px  color-mix(in srgb, var(--accent) 60%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.landing-subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: -12px;
+  max-width: 400px;
+}
+
+/* ── Rule cards row ─────────────────────────────────────────────────────────── */
+.rule-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ── Individual rule card ────────────────────────────────────────────────────── */
+.rule-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px 20px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow:
+    0 0  8px color-mix(in srgb, var(--accent) 20%, transparent),
+    0 0 18px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ── Canvas inside rule card ────────────────────────────────────────────────── */
+.rule-canvas {
+  display: block;
+  border-radius: 4px;
+  /* Size is set by JS (80×80 logical px), but we clamp with CSS too */
+  width: 80px;
+  height: 80px;
+  image-rendering: pixelated;
+}
+
+/* ── Card text ───────────────────────────────────────────────────────────────── */
+.rule-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.rule-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 200px;
+}
+
+/* ── Play button ─────────────────────────────────────────────────────────────── */
+.landing-btn {
+  /* Override the global button reset */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;           /* Apple HIG touch target */
+  padding: 14px 48px;
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;  /* remove 300ms tap delay on iOS */
+
+  background: var(--accent);
+  color: #0f172a;              /* dark text on green */
+  border: none;
+  border-radius: var(--radius);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.landing-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--accent) 60%, transparent),
+    0 0 40px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.landing-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.landing-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Desktop layout: cards side by side ─────────────────────────────────────── */
+@media (min-width: 600px) {
+  .landing-title {
+    font-size: 2.5rem;
+  }
+
+  .landing-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .rule-cards {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .rule-card {
+    flex: 1;
+    max-width: 240px;
+  }
+}
