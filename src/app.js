@@ -54,6 +54,8 @@ function init() {
   clearBtn.addEventListener('click', clear);
   gridBtn.addEventListener('click',  toggleGrid);
   speedEl.addEventListener('input',  onSpeedChange);
+  // Reset to blank before picker opens so the same option can be re-selected
+  patternSel.addEventListener('pointerdown', () => { patternSel.value = ''; });
   patternSel.addEventListener('change', onPatternChange);
 
   game.randomize();
@@ -158,7 +160,6 @@ function onSpeedChange() {
 
 function onPatternChange() {
   const idx = parseInt(patternSel.value, 10);
-  patternSel.value = '';
   if (isNaN(idx)) return;
   const pattern = PATTERNS[idx];
   if (!pattern) return;
