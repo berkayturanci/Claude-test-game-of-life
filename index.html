@@ -110,15 +110,12 @@
       // Make the game shell visible before initialising
       const app = document.getElementById('app');
       app.style.display = '';        // remove inline display:none
-      app.style.opacity = '0';
-      app.style.transition = 'opacity 0.5s ease';
 
       // Small rAF delay so the browser paints #app before we resize its canvas
       requestAnimationFrame(() => {
         requestAnimationFrame(async () => {
           const { init } = await import('./src/app.js');
           init();
-          app.style.opacity = '1';
         });
       });
     });
