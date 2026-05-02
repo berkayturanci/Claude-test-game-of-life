@@ -79,25 +79,34 @@ class BackgroundSim {
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = accent;
 
+    let live = 0;
     for (let row = 0; row < game.rows; row++) {
       for (let col = 0; col < game.cols; col++) {
         if (game.grid[row * game.cols + col]) {
+          live++;
           ctx.fillRect(col * cellW + 0.5, row * cellH + 0.5, cellW - 0.5, cellH - 0.5);
         }
       }
     }
+
+    const cellCount = document.getElementById('cell-count');
+    if (cellCount) cellCount.textContent = live.toLocaleString();
   }
 
   _loop() {
     // Step every ~100ms (≈10fps) to keep CPU light
     const STEP_INTERVAL = 100;
     let last = 0;
+    let generation = 0;
     const tick = (ts) => {
       if (this.rafId === null) return; // stopped
       this.rafId = requestAnimationFrame(tick);
       if (ts - last >= STEP_INTERVAL) {
         this.game.step();
+        generation++;
         this._draw();
+        const genCount = document.getElementById('gen-count');
+        if (genCount) genCount.textContent = generation.toLocaleString();
         last = ts;
       }
     };
@@ -366,7 +375,7 @@ class PatternDemo {
 export function initLanding(onPlay) {
   const landing   = document.getElementById('landing');
   const bgCanvas  = document.getElementById('landing-bg');
-  const playBtn   = document.getElementById('landing-play');
+  const playBtns  = document.querySelectorAll('.landing-start');
 
   // Background simulation
   const bgSim = new BackgroundSim(bgCanvas);
@@ -390,9 +399,9 @@ export function initLanding(onPlay) {
   patternDemos.forEach(d => d.start());
 
   // Play button → transition
-  playBtn.addEventListener('click', () => {
+  const startGame = () => {
     // Prevent double-clicks
-    playBtn.disabled = true;
+    playBtns.forEach(btn => { btn.disabled = true; });
 
     // Fade out landing
     landing.classList.add('landing--fade-out');
@@ -424,5 +433,7 @@ export function initLanding(onPlay) {
     // Safety: if transitionend never fires (e.g. prefers-reduced-motion),
     // fall back after the expected duration + a small buffer.
     setTimeout(finish, transDuration + 100);
-  });
+  };
+
+  playBtns.forEach(btn => btn.addEventListener('click', startGame));
 }

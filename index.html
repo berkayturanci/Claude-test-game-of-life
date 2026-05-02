@@ -21,73 +21,142 @@
     <!-- Full-screen background simulation canvas -->
     <canvas id="landing-bg" aria-hidden="true"></canvas>
 
-    <!-- Centred content card -->
-    <div class="landing-content">
+    <nav class="landing-nav" aria-label="Landing navigation">
+      <div class="nav-logo">GAME <span>of</span> LIFE</div>
+      <div class="nav-links">
+        <a href="#rules">Rules</a>
+        <a href="#howto">How to Play</a>
+        <a href="#patterns">Patterns</a>
+      </div>
+    </nav>
 
-      <h1 class="landing-title">Conway's<br>Game&nbsp;of&nbsp;Life</h1>
-
-      <p class="landing-subtitle">A zero-player game that evolves from an initial state.</p>
-
-      <!-- Rule cards -->
-      <div class="rule-cards">
-
-        <div class="rule-card">
-          <canvas id="card-canvas-1" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Underpopulation</h2>
-          <p class="rule-desc">A live cell with fewer than&nbsp;2 live neighbours&nbsp;dies.</p>
+    <section class="landing-hero" aria-labelledby="landing-title">
+      <div class="landing-grid-lines" aria-hidden="true"></div>
+      <div class="landing-content">
+        <p class="hero-tag">Conway's Cellular Automaton · 1970</p>
+        <h1 id="landing-title" class="landing-title glitch-animate">
+          GAME<br><span>OF</span> <em>LIFE</em>
+        </h1>
+        <p class="landing-subtitle">
+          A zero-player game where life emerges from simple rules.
+          Watch patterns evolve, collide, and multiply in real time.
+        </p>
+        <div class="hero-cta">
+          <button id="landing-play" class="landing-btn landing-start" aria-label="Start the game">
+            <span>Play Now</span>
+          </button>
+          <a class="landing-link" href="#rules">Learn the Rules</a>
         </div>
-
-        <div class="rule-card">
-          <canvas id="card-canvas-2" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Survival</h2>
-          <p class="rule-desc">A live cell with 2 or&nbsp;3 live neighbours&nbsp;lives on.</p>
+        <div class="hero-stats" aria-label="Live simulation statistics">
+          <div class="stat"><span class="stat-num" id="cell-count">0</span><span class="stat-label">Live Cells</span></div>
+          <div class="stat"><span class="stat-num" id="gen-count">0</span><span class="stat-label">Generation</span></div>
+          <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Possibilities</span></div>
         </div>
+      </div>
+    </section>
 
-        <div class="rule-card">
-          <canvas id="card-canvas-3" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Overpopulation</h2>
-          <p class="rule-desc">A live cell with more than&nbsp;3 live neighbours&nbsp;dies.</p>
+    <section id="rules" class="landing-section" aria-labelledby="rules-title">
+      <div class="section-inner">
+        <p class="section-tag">The Four Laws</p>
+        <h2 id="rules-title" class="section-title">Rules of Existence</h2>
+        <div class="rule-cards">
+          <article class="rule-card">
+            <div class="rule-canvas-wrap"><canvas id="card-canvas-1" class="rule-canvas" aria-hidden="true"></canvas></div>
+            <span class="rule-number">01</span>
+            <h3 class="rule-title">Underpopulation</h3>
+            <p class="rule-desc">A live cell with fewer than 2 live neighbours dies.</p>
+          </article>
+
+          <article class="rule-card">
+            <div class="rule-canvas-wrap"><canvas id="card-canvas-2" class="rule-canvas" aria-hidden="true"></canvas></div>
+            <span class="rule-number">02</span>
+            <h3 class="rule-title">Survival</h3>
+            <p class="rule-desc">A live cell with 2 or 3 live neighbours lives on.</p>
+          </article>
+
+          <article class="rule-card">
+            <div class="rule-canvas-wrap"><canvas id="card-canvas-3" class="rule-canvas" aria-hidden="true"></canvas></div>
+            <span class="rule-number">03</span>
+            <h3 class="rule-title">Overpopulation</h3>
+            <p class="rule-desc">A live cell with more than 3 live neighbours dies.</p>
+          </article>
+
+          <article class="rule-card">
+            <span class="rule-number">04</span>
+            <h3 class="rule-title">Reproduction</h3>
+            <p class="rule-desc">A dead cell with exactly 3 live neighbours becomes alive.</p>
+          </article>
         </div>
+      </div>
+    </section>
 
-      </div><!-- /.rule-cards -->
+    <section id="howto" class="landing-section" aria-labelledby="howto-title">
+      <div class="section-inner">
+        <p class="section-tag">Getting Started</p>
+        <h2 id="howto-title" class="section-title">How to Play</h2>
+        <div class="steps-row">
+          <article class="step">
+            <span class="step-num">STEP 01</span>
+            <h3 class="step-title">Draw Your Pattern</h3>
+            <p class="step-desc">Tap or drag across the grid to toggle cells alive or dead and create your seed.</p>
+          </article>
+          <article class="step">
+            <span class="step-num">STEP 02</span>
+            <h3 class="step-title">Start the Simulation</h3>
+            <p class="step-desc">Press play and watch each generation unfold from the four simple rules.</p>
+          </article>
+          <article class="step">
+            <span class="step-num">STEP 03</span>
+            <h3 class="step-title">Observe &amp; Iterate</h3>
+            <p class="step-desc">Pause, step forward, adjust speed, and load classic patterns from the menu.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-      <!-- Pattern types showcase -->
-      <div class="pattern-showcase">
-        <p class="showcase-label">Load classic patterns from the in-game Patterns menu</p>
+    <section id="patterns" class="landing-section pattern-showcase" aria-labelledby="patterns-title">
+      <div class="section-inner">
+        <p class="section-tag">Known Patterns</p>
+        <h2 id="patterns-title" class="section-title">Classic Seeds Included</h2>
         <div class="pattern-type-cards">
-
-          <div class="pattern-type-card">
+          <article class="pattern-type-card">
             <canvas id="demo-canvas-1" class="demo-canvas" aria-hidden="true"></canvas>
             <strong class="pattern-type-name">Still Life</strong>
-            <p class="pattern-type-desc">Stable forever — never changes.</p>
-          </div>
-
-          <div class="pattern-type-card">
+            <p class="pattern-type-desc">Stable forever.</p>
+          </article>
+          <article class="pattern-type-card">
             <canvas id="demo-canvas-2" class="demo-canvas" aria-hidden="true"></canvas>
             <strong class="pattern-type-name">Oscillator</strong>
-            <p class="pattern-type-desc">Repeats on a fixed cycle.</p>
-          </div>
-
-          <div class="pattern-type-card">
+            <p class="pattern-type-desc">Repeats on a cycle.</p>
+          </article>
+          <article class="pattern-type-card">
             <canvas id="demo-canvas-3" class="demo-canvas" aria-hidden="true"></canvas>
             <strong class="pattern-type-name">Spaceship</strong>
-            <p class="pattern-type-desc">Travels across the grid forever.</p>
-          </div>
-
-          <div class="pattern-type-card pattern-type-card--wide">
+            <p class="pattern-type-desc">Travels the grid.</p>
+          </article>
+          <article class="pattern-type-card">
             <canvas id="demo-canvas-4" class="demo-canvas" aria-hidden="true"></canvas>
             <strong class="pattern-type-name">Gun</strong>
-            <p class="pattern-type-desc">Fires an endless stream of spaceships.</p>
-          </div>
-
+            <p class="pattern-type-desc">Fires spaceships.</p>
+          </article>
         </div>
-      </div><!-- /.pattern-showcase -->
+      </div>
+    </section>
 
-      <button id="landing-play" class="landing-btn" aria-label="Start the game">
-        Play
-      </button>
+    <section class="landing-cta" aria-labelledby="cta-title">
+      <div class="landing-grid-lines" aria-hidden="true"></div>
+      <div class="cta-content">
+        <p class="hero-tag">Ready to Begin?</p>
+        <h2 id="cta-title" class="cta-title">BEGIN<br><span>YOUR UNIVERSE</span></h2>
+        <p class="cta-sub">Every great pattern starts with a single living cell.</p>
+        <button class="landing-btn landing-start" type="button">Launch Game</button>
+      </div>
+    </section>
 
-    </div><!-- /.landing-content -->
+    <footer class="landing-footer">
+      <span>GAME OF LIFE · CONWAY'S CELLULAR AUTOMATON</span>
+      <span>2026 · berkayturanci</span>
+    </footer>
 
   </div><!-- /#landing -->
 
