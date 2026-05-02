@@ -90,6 +90,7 @@ header h1 {
 
 .btn-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
 }
@@ -126,6 +127,31 @@ button.active {
 #btn-play {
   min-width: 56px;
   font-size: 18px;
+}
+
+/* Pattern preset dropdown */
+#pattern-select {
+  -webkit-appearance: none;
+  appearance: none;
+  height: var(--btn-h);
+  padding: 0 28px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.1s;
+}
+
+#pattern-select:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* ── Speed row ─────────────────────────────────────────────────────────────── */

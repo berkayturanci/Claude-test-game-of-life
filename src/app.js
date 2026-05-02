@@ -1,6 +1,7 @@
 import { GameOfLife } from './game.js';
 import { Renderer } from './renderer.js';
 import { Controls } from './controls.js';
+import { PATTERNS } from './patterns.js';
 
 // Target logical pixels per cell. Smaller = more cells on screen.
 const CELL_SIZE = 8;
@@ -12,9 +13,10 @@ const playBtn  = document.getElementById('btn-play');
 const stepBtn  = document.getElementById('btn-step');
 const randBtn  = document.getElementById('btn-rand');
 const clearBtn = document.getElementById('btn-clear');
-const gridBtn  = document.getElementById('btn-grid');
-const speedEl  = document.getElementById('speed-range');
-const speedLbl = document.getElementById('speed-label');
+const gridBtn    = document.getElementById('btn-grid');
+const speedEl    = document.getElementById('speed-range');
+const speedLbl   = document.getElementById('speed-label');
+const patternSel = document.getElementById('pattern-select');
 
 let game;
 let renderer = new Renderer(canvas);
@@ -52,6 +54,7 @@ function init() {
   clearBtn.addEventListener('click', clear);
   gridBtn.addEventListener('click',  toggleGrid);
   speedEl.addEventListener('input',  onSpeedChange);
+  patternSel.addEventListener('change', onPatternChange);
 
   game.randomize();
   renderer.draw(game);
@@ -151,6 +154,29 @@ function toggleGrid() {
 function onSpeedChange() {
   speed = parseInt(speedEl.value, 10);
   speedLbl.textContent = speed + ' fps';
+}
+
+function onPatternChange() {
+  const idx = parseInt(patternSel.value, 10);
+  patternSel.value = '';
+  if (isNaN(idx)) return;
+  const pattern = PATTERNS[idx];
+  if (!pattern) return;
+  if (playing) togglePlay();
+  const maxC = Math.max(...pattern.cells.map(([c]) => c));
+  const maxR = Math.max(...pattern.cells.map(([, r]) => r));
+  const offC = Math.floor((game.cols - maxC - 1) / 2);
+  const offR = Math.floor((game.rows - maxR - 1) / 2);
+  game.clear();
+  for (const [c, r] of pattern.cells) {
+    const gc = offC + c;
+    const gr = offR + r;
+    if (gc >= 0 && gc < game.cols && gr >= 0 && gr < game.rows) {
+      game.set(gc, gr, 1);
+    }
+  }
+  renderer.draw(game);
+  updateStats();
 }
 
 function updateStats() {
