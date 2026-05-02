@@ -578,8 +578,10 @@ button.active {
 }
 
 .landing-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -614,18 +616,27 @@ button.active {
 }
 
 .nav-links a,
-.landing-link {
+.landing-link,
+.nav-play {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--muted);
   text-decoration: none;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   transition: color 0.2s, border-color 0.2s;
 }
 
 .nav-links a:hover,
-.landing-link:hover {
+.landing-link:hover,
+.nav-play:hover {
   color: var(--cyan);
 }
 
@@ -633,11 +644,40 @@ button.active {
 .landing-cta {
   position: relative;
   z-index: 3;
-  min-height: 100svh;
+  min-height: 700px;
+  height: 100svh;
   display: grid;
   place-items: center;
   padding: 96px 20px 72px;
   overflow: hidden;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  z-index: 4;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 1.2s 1s ease both;
+}
+
+.scroll-text {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  animation: scrollPulse 2s infinite;
 }
 
 .landing-grid-lines {
@@ -816,7 +856,7 @@ button.active {
 }
 
 .rule-cards {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   animation: none;
 }
 
@@ -853,7 +893,7 @@ button.active {
 
 .rule-number {
   font-family: var(--mono);
-  font-size: 54px;
+  font-size: 72px;
   font-weight: 800;
   line-height: 1;
   color: oklch(0.19 0.06 195);
@@ -892,6 +932,60 @@ button.active {
   color: var(--text);
 }
 
+.known-patterns {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  background: oklch(0.07 0.03 195 / 0.55);
+}
+
+.known-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+
+.known-copy {
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.known-items {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.known-items span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.known-items i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulseDot 1.5s infinite;
+}
+
 .pattern-type-card {
   align-items: center;
   text-align: center;
@@ -907,6 +1001,16 @@ button.active {
   min-height: 72svh;
   border-top: 1px solid var(--border);
   background: oklch(0.04 0.02 195 / 0.94);
+}
+
+#cta-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .cta-title {
@@ -942,6 +1046,16 @@ button.active {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
 @keyframes glitch {
   0%, 90%, 100% {
     transform: none;
@@ -961,8 +1075,7 @@ button.active {
 
 @media (max-width: 900px) {
   .rule-cards,
-  .steps-row,
-  .pattern-type-cards {
+  .steps-row {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -977,8 +1090,7 @@ button.active {
   }
 
   .rule-cards,
-  .steps-row,
-  .pattern-type-cards {
+  .steps-row {
     grid-template-columns: 1fr;
   }
 

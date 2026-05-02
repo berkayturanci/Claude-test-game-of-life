@@ -26,7 +26,7 @@
       <div class="nav-links">
         <a href="#rules">Rules</a>
         <a href="#howto">How to Play</a>
-        <a href="#patterns">Patterns</a>
+        <button class="nav-play landing-start" type="button">Play Now</button>
       </div>
     </nav>
 
@@ -52,6 +52,10 @@
           <div class="stat"><span class="stat-num" id="gen-count">0</span><span class="stat-label">Generation</span></div>
           <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Possibilities</span></div>
         </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <span class="scroll-text">Scroll</span>
+        <div class="scroll-line"></div>
       </div>
     </section>
 
@@ -82,6 +86,7 @@
           </article>
 
           <article class="rule-card">
+            <div class="rule-canvas-wrap"><canvas id="card-canvas-4" class="rule-canvas" aria-hidden="true"></canvas></div>
             <span class="rule-number">04</span>
             <h3 class="rule-title">Reproduction</h3>
             <p class="rule-desc">A dead cell with exactly 3 live neighbours becomes alive.</p>
@@ -111,39 +116,22 @@
             <p class="step-desc">Pause, step forward, adjust speed, and load classic patterns from the menu.</p>
           </article>
         </div>
-      </div>
-    </section>
-
-    <section id="patterns" class="landing-section pattern-showcase" aria-labelledby="patterns-title">
-      <div class="section-inner">
-        <p class="section-tag">Known Patterns</p>
-        <h2 id="patterns-title" class="section-title">Classic Seeds Included</h2>
-        <div class="pattern-type-cards">
-          <article class="pattern-type-card">
-            <canvas id="demo-canvas-1" class="demo-canvas" aria-hidden="true"></canvas>
-            <strong class="pattern-type-name">Still Life</strong>
-            <p class="pattern-type-desc">Stable forever.</p>
-          </article>
-          <article class="pattern-type-card">
-            <canvas id="demo-canvas-2" class="demo-canvas" aria-hidden="true"></canvas>
-            <strong class="pattern-type-name">Oscillator</strong>
-            <p class="pattern-type-desc">Repeats on a cycle.</p>
-          </article>
-          <article class="pattern-type-card">
-            <canvas id="demo-canvas-3" class="demo-canvas" aria-hidden="true"></canvas>
-            <strong class="pattern-type-name">Spaceship</strong>
-            <p class="pattern-type-desc">Travels the grid.</p>
-          </article>
-          <article class="pattern-type-card">
-            <canvas id="demo-canvas-4" class="demo-canvas" aria-hidden="true"></canvas>
-            <strong class="pattern-type-name">Gun</strong>
-            <p class="pattern-type-desc">Fires spaceships.</p>
-          </article>
+        <div class="known-patterns">
+          <div>
+            <p class="known-label">Known Patterns</p>
+            <p class="known-copy">Start with a Glider, Blinker, or Gosper Glider Gun — classic patterns included.</p>
+          </div>
+          <div class="known-items">
+            <span><i></i>Glider</span>
+            <span><i></i>Blinker</span>
+            <span><i></i>Glider Gun</span>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="landing-cta" aria-labelledby="cta-title">
+      <canvas id="cta-canvas" aria-hidden="true"></canvas>
       <div class="landing-grid-lines" aria-hidden="true"></div>
       <div class="cta-content">
         <p class="hero-tag">Ready to Begin?</p>
