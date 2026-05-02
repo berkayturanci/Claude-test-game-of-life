@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Disable user scaling so the game feels native on iOS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- iOS home-screen app appearance -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Game of Life</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header>
+      <h1>Game&nbsp;of&nbsp;Life</h1>
+      <div class="stats">
+        <span>Gen&nbsp;<b id="stat-gen">0</b></span>
+        <span>Pop&nbsp;<b id="stat-pop">0</b></span>
+      </div>
+    </header>
+
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <div id="controls">
+      <div class="btn-row">
+        <button id="btn-play"  aria-label="Play">▶</button>
+        <button id="btn-step"  aria-label="Step one generation">Step</button>
+        <button id="btn-rand"  aria-label="Randomize">Rand</button>
+        <button id="btn-clear" aria-label="Clear board">Clear</button>
+        <button id="btn-grid"  aria-label="Toggle grid" class="active">Grid</button>
+      </div>
+      <div class="speed-row">
+        <label for="speed-range">Speed</label>
+        <input id="speed-range" type="range" min="1" max="60" value="10" />
+        <span id="speed-label">10 fps</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!--
+    Keyboard shortcuts:
+      Space       – play / pause
+      → / N       – step one generation (while paused)
+      R           – randomize
+      C           – clear
+      G           – toggle grid
+  -->
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
