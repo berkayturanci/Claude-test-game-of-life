@@ -1,15 +1,20 @@
 /* ── Design tokens ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --bg:      #0f172a;   /* slate-900  – page background                        */
-  --surface: #1e293b;   /* slate-800  – header / controls background            */
-  --border:  #334155;   /* slate-700  – dividers                                */
-  --text:    #f1f5f9;   /* slate-100  – primary text                            */
-  --muted:   #94a3b8;   /* slate-400  – secondary text                          */
-  --accent:  #4ade80;   /* green-400  – live cells, active state, highlights     */
-  --dead:    #0f172a;   /* canvas dead-cell colour (matches --bg)                */
-  --grid:    #1e293b;   /* canvas grid-line colour (matches --surface)           */
-  --btn-h:   44px;      /* minimum touch-target height (Apple HIG)              */
-  --radius:  8px;
+  --bg:      #050a0e;
+  --surface: #090f15;
+  --border:  oklch(0.25 0.06 195);
+  --text:    oklch(0.88 0.03 195);
+  --muted:   oklch(0.55 0.04 195);
+  --accent:  oklch(0.75 0.22 145);   /* neon green */
+  --cyan:    oklch(0.75 0.18 195);   /* neon cyan  */
+  --dead:    #050a0e;
+  --grid:    oklch(0.18 0.05 195);
+  --btn-h:   44px;
+  --radius:  4px;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sans: 'Space Grotesk', system-ui, sans-serif;
 }
 
 /* ── Reset / base ──────────────────────────────────────────────────────────── */
@@ -17,12 +22,13 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;           /* prevent page scroll; the app is fixed-viewport */
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-family: var(--mono);
   font-size: 14px;
-  -webkit-text-size-adjust: 100%;  /* prevent iOS font scaling on rotation     */
+  -webkit-text-size-adjust: 100%;
+  cursor: crosshair;
 }
 
 /* ── App shell ─────────────────────────────────────────────────────────────── */
@@ -220,8 +226,38 @@ button.active {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Landing / Intro screen
+   Landing / Intro screen — Neon Dark Theme
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Scanline overlay ───────────────────────────────────────────────────────── */
+#landing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0.0 0 0 / 0.05) 2px,
+    oklch(0.0 0 0 / 0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Grid background ────────────────────────────────────────────────────────── */
+#landing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(oklch(0.18 0.05 195) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.18 0.05 195) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+}
 
 /* ── Wrapper ────────────────────────────────────────────────────────────────── */
 #landing {
@@ -232,12 +268,10 @@ button.active {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;             /* allow scroll on short/landscape viewports */
-  overscroll-behavior: contain; /* prevent scroll bleeding to the page behind */
-
-  /* Fade transition — triggered by .landing--fade-out */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   opacity: 1;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.6s ease;
 }
 
 #landing.landing--fade-out {
@@ -250,49 +284,63 @@ button.active {
   position: absolute;
   inset: 0;
   display: block;
-  opacity: 0.15;
-  pointer-events: none;        /* let touches pass through to scrollable content  */
+  opacity: 0.38;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* ── Content card (sits above background) ───────────────────────────────────── */
+/* ── Content card ───────────────────────────────────────────────────────────── */
 .landing-content {
-  position: relative;        /* above #landing-bg */
-  z-index: 1;
+  position: relative;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
-  padding: 32px 20px 36px;
-  max-width: 860px;
+  gap: 32px;
+  padding: 40px 24px 44px;
+  max-width: 900px;
   width: 100%;
   text-align: center;
 }
 
 /* ── Title ──────────────────────────────────────────────────────────────────── */
 .landing-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  color: var(--accent);
+  font-family: var(--mono);
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: var(--text);
   text-shadow:
-    0 0 8px  color-mix(in srgb, var(--accent) 60%, transparent),
-    0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+    0 0 40px oklch(0.75 0.22 145 / 0.25),
+    0 0 80px oklch(0.75 0.22 145 / 0.1);
+  animation: landingFadeUp 0.9s ease both;
 }
 
+.landing-title br + * { color: var(--accent); text-shadow: 0 0 30px var(--accent); }
+
 .landing-subtitle {
-  font-size: 0.9rem;
-  color: var(--muted);
+  font-family: var(--sans);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 400;
+  color: oklch(0.78 0.04 195);
   margin-top: -12px;
-  max-width: 400px;
+  max-width: 420px;
+  line-height: 1.7;
+  padding: 12px 18px;
+  border-left: 2px solid oklch(0.75 0.18 195 / 0.5);
+  background: oklch(0.04 0.02 195 / 0.4);
+  text-align: left;
+  animation: landingFadeUp 0.9s 0.15s ease both;
 }
 
 /* ── Rule cards row ─────────────────────────────────────────────────────────── */
 .rule-cards {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 2px;
   width: 100%;
+  animation: landingFadeUp 0.9s 0.3s ease both;
 }
 
 /* ── Individual rule card ────────────────────────────────────────────────────── */
@@ -301,20 +349,33 @@ button.active {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 18px 20px 20px;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  box-shadow:
-    0 0  8px color-mix(in srgb, var(--accent) 20%, transparent),
-    0 0 18px color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 20px 24px 22px;
+  background: oklch(0.07 0.03 195 / 0.8);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
 }
+
+.rule-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s;
+}
+
+.rule-card:hover { border-color: oklch(0.45 0.15 145); background: oklch(0.09 0.04 195 / 0.9); }
+.rule-card:hover::after { transform: scaleX(1); }
 
 /* ── Canvas inside rule card ────────────────────────────────────────────────── */
 .rule-canvas {
   display: block;
-  border-radius: 4px;
-  /* Size is set by JS (80×80 logical px), but we clamp with CSS too */
   width: 80px;
   height: 80px;
   image-rendering: pixelated;
@@ -322,37 +383,56 @@ button.active {
 
 /* ── Card text ───────────────────────────────────────────────────────────────── */
 .rule-title {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  text-shadow: 0 0 10px var(--accent);
 }
 
 .rule-desc {
+  font-family: var(--sans);
   font-size: 0.8rem;
-  color: var(--muted);
-  line-height: 1.5;
+  font-weight: 400;
+  color: oklch(0.7 0.04 195);
+  line-height: 1.6;
   max-width: 200px;
 }
 
 /* ── Pattern type showcase ───────────────────────────────────────────────────── */
 .pattern-showcase {
   width: 100%;
+  animation: landingFadeUp 0.9s 0.45s ease both;
 }
 
 .showcase-label {
-  font-size: 0.72rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
   color: var(--muted);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.showcase-label::before,
+.showcase-label::after {
+  content: '';
+  flex: 1;
+  max-width: 60px;
+  height: 1px;
+  background: var(--border);
 }
 
 .pattern-type-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 2px;
   justify-content: center;
 }
 
@@ -361,32 +441,37 @@ button.active {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 12px 16px;
-  background: var(--surface);
+  padding: 14px 18px;
+  background: oklch(0.07 0.03 195 / 0.7);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  min-width: 90px;
+  border-radius: 0;
+  min-width: 100px;
+  transition: border-color 0.2s;
 }
 
+.pattern-type-card:hover { border-color: oklch(0.45 0.15 145); }
+
 .pattern-type-card--wide {
-  flex-basis: 100%;       /* gun card spans full row on mobile */
+  flex-basis: 100%;
 }
 
 .demo-canvas {
   display: block;
   image-rendering: pixelated;
-  border-radius: 3px;
 }
 
 .pattern-type-name {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px var(--accent);
 }
 
 .pattern-type-desc {
-  font-size: 0.7rem;
+  font-family: var(--sans);
+  font-size: 0.68rem;
   color: var(--muted);
   line-height: 1.4;
   max-width: 130px;
@@ -394,71 +479,75 @@ button.active {
 
 @media (min-width: 600px) {
   .pattern-type-card--wide {
-    flex-basis: auto;    /* gun card joins the row on desktop */
+    flex-basis: auto;
   }
 }
 
 /* ── Play button ─────────────────────────────────────────────────────────────── */
 .landing-btn {
-  /* Override the global button reset */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;           /* Apple HIG touch target */
-  padding: 14px 48px;
-  font: inherit;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  min-height: 52px;
+  padding: 16px 56px;
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;  /* remove 300ms tap delay on iOS */
+  touch-action: manipulation;
 
   background: var(--accent);
-  color: #0f172a;              /* dark text on green */
+  color: #050a0e;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 0;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
   box-shadow:
-    0 0 12px color-mix(in srgb, var(--accent) 40%, transparent),
-    0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
-
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    0 0 20px oklch(0.75 0.22 145 / 0.4),
+    0 0 50px oklch(0.75 0.22 145 / 0.15);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.15s;
+  animation: landingFadeUp 0.9s 0.6s ease both;
 }
 
 .landing-btn:hover:not(:disabled) {
-  transform: scale(1.05);
+  background: var(--cyan);
   box-shadow:
-    0 0 18px color-mix(in srgb, var(--accent) 60%, transparent),
-    0 0 40px color-mix(in srgb, var(--accent) 30%, transparent);
+    0 0 28px oklch(0.75 0.18 195 / 0.6),
+    0 0 60px oklch(0.75 0.18 195 / 0.25);
+  transform: translateY(-2px);
 }
 
 .landing-btn:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
 }
 
 .landing-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: default;
 }
 
-/* ── Desktop layout: cards side by side ─────────────────────────────────────── */
-@media (min-width: 600px) {
-  .landing-title {
-    font-size: 2.5rem;
-  }
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes landingFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  .landing-subtitle {
-    font-size: 0.95rem;
-  }
+/* ── Desktop layout ─────────────────────────────────────────────────────────── */
+@media (min-width: 600px) {
+  .landing-title { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+  .landing-subtitle { font-size: 0.95rem; text-align: left; }
 
   .rule-cards {
     flex-direction: row;
     justify-content: center;
+    gap: 2px;
   }
 
   .rule-card {
     flex: 1;
-    max-width: 240px;
+    max-width: 260px;
   }
 }
