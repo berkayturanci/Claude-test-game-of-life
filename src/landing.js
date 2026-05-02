@@ -8,6 +8,7 @@
  */
 
 import { GameOfLife } from './game.js';
+import { liveCellColor } from './renderer.js';
 
 // ─── CSS custom property helpers ─────────────────────────────────────────────
 
@@ -74,20 +75,27 @@ class BackgroundSim {
     const h = canvas.height / dpr;
     const cellW = w / game.cols;
     const cellH = h / game.rows;
-    const accent = css('--accent') || '#4ade80';
+    const liveColors = {
+      sparse: css('--cell-sparse') || 'rgb(0,255,160)',
+      stable: css('--cell-stable') || 'rgb(0,237,207)',
+      crowded: css('--cell-crowded') || 'rgb(0,220,255)',
+    };
 
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = accent;
 
     let live = 0;
     for (let row = 0; row < game.rows; row++) {
       for (let col = 0; col < game.cols; col++) {
         if (game.grid[row * game.cols + col]) {
           live++;
+          ctx.fillStyle = liveCellColor(game.countNeighbors(col, row), liveColors);
+          ctx.shadowColor = ctx.fillStyle;
+          ctx.shadowBlur = 8;
           ctx.fillRect(col * cellW + 0.5, row * cellH + 0.5, cellW - 0.5, cellH - 0.5);
         }
       }
     }
+    ctx.shadowBlur = 0;
 
     const cellCount = document.getElementById('cell-count');
     if (cellCount) cellCount.textContent = live.toLocaleString();
@@ -161,7 +169,7 @@ class CardDemo {
 
   _draw(grid) {
     const { ctx, dpr } = this;
-    const accent = css('--accent') || '#4ade80';
+    const accent = css('--cell-sparse') || css('--accent') || '#4ade80';
     const bg     = css('--bg')     || '#0f172a';
     const border = css('--border') || '#334155';
     const logical = CARD_COLS * CARD_CELL;
@@ -358,7 +366,7 @@ class PatternDemo {
     const { cols, rows } = game;
     ctx.fillStyle = css('--dead') || '#0f172a';
     ctx.fillRect(0, 0, cols * cellPx, rows * cellPx);
-    ctx.fillStyle = css('--accent') || '#4ade80';
+    ctx.fillStyle = css('--cell-sparse') || css('--accent') || '#4ade80';
     for (let r = 0; r < rows; r++)
       for (let c = 0; c < cols; c++)
         if (game.grid[r * cols + c])
@@ -439,16 +447,19 @@ class CtaGunSim {
     const cell = Math.min(w / game.cols, h / game.rows) * 0.85;
     const offX = (w - game.cols * cell) / 2;
     const offY = (h - game.rows * cell) / 2;
-    const accent = css('--accent') || '#4ade80';
-    const cyan = css('--cyan') || '#22d3ee';
+    const liveColors = {
+      sparse: css('--cell-sparse') || 'rgb(0,255,160)',
+      stable: css('--cell-stable') || 'rgb(0,237,207)',
+      crowded: css('--cell-crowded') || 'rgb(0,220,255)',
+    };
 
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = accent;
-    ctx.shadowColor = cyan;
-    ctx.shadowBlur = 8;
     for (let row = 0; row < game.rows; row++) {
       for (let col = 0; col < game.cols; col++) {
         if (game.grid[row * game.cols + col]) {
+          ctx.fillStyle = liveCellColor(game.countNeighbors(col, row), liveColors);
+          ctx.shadowColor = ctx.fillStyle;
+          ctx.shadowBlur = 8;
           ctx.fillRect(offX + col * cell + 1, offY + row * cell + 1, cell - 1.5, cell - 1.5);
         }
       }
