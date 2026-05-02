@@ -26,12 +26,12 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
-          enablement: true   # enables Pages if not already on
+          enablement: true
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .   # repo root = index.html entry point
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deploy
