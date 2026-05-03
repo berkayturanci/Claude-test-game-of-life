@@ -126,3 +126,64 @@ All colours are CSS custom properties on `:root`. Change only those variables to
 | `R` | Randomize |
 | `C` | Clear |
 | `G` | Toggle grid |
+
+## Agent safety rules — preventing file overwrite (ezilme)
+
+These rules exist because PR #11 overwrote a major redesign (commits `523c3c4`, `61753e8`, `b776307`) that was pushed to main after the agent's session started. Follow them on every task.
+
+### Before touching any file
+
+1. **Always sync before branching.**
+   ```bash
+   git fetch origin
+   git log origin/main -5          # see what landed since your session started
+   ```
+   If `origin/main` has commits you don't have locally, pull first:
+   ```bash
+   git pull origin main
+   ```
+
+2. **Branch from `origin/main`, not from local HEAD.**
+   ```bash
+   git checkout -b feat/my-thing origin/main
+   ```
+   Never branch from a local snapshot that may be behind.
+
+3. **Check the last-touching commit for each file you plan to modify.**
+   ```bash
+   git log --oneline -3 -- src/landing.js styles/main.css
+   ```
+   If the file was touched in a commit you don't recognise, read it fresh with `Read` before writing.
+
+### When writing files
+
+4. **Prefer targeted `Edit` over full-file `Write`.** `Write` replaces the entire file. If any line was added after your last `Read`, you silently drop it. Use `Edit` with the smallest possible old/new strings.
+
+5. **Never push a full-file replacement for a file touched in the last 5 commits** without first diffing against `origin/main`:
+   ```bash
+   git diff origin/main -- src/landing.js
+   ```
+
+6. **After staging, diff before committing.**
+   ```bash
+   git diff --cached --stat
+   ```
+   If the stat shows unexpected deletions (e.g. `-570` lines in a CSS file), stop and investigate.
+
+### When creating PRs
+
+7. **State the base commit in the PR description** so a reviewer can verify the branch was cut from the latest main, not from an older snapshot.
+
+8. **If a PR was created before these checks were done, do NOT merge it.** Fetch main, rebase, re-read every changed file, then re-push.
+
+### Cloudflare Pages deployment
+
+The site deploys to Cloudflare Pages via `.github/workflows/cloudflare-pages.yml`.
+Two repository secrets are required (set in GitHub → Settings → Secrets → Actions):
+
+| Secret | Where to get it |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create Token (Pages: Edit) |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → right-hand sidebar on any zone page |
+
+The Cloudflare Pages project name is `game-of-life` (must match the project created in the Cloudflare dashboard). No build command — the site is deployed as-is from the repo root.
