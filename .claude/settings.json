@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "result=$(grep -rn 'console\\.log' src/ 2>/dev/null); if [ -n \"$result\" ]; then echo \"warning: console.log found in src/ — remove before committing\n$result\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
