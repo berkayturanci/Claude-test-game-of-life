@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game of Life — Brand Assets</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #050a0e; color: #c8dde8; font-family: 'JetBrains Mono', monospace; padding: 48px; }
+
+h1 { font-size: 11px; letter-spacing: 0.3em; color: #00dcff; text-transform: uppercase; margin-bottom: 48px; }
+
+.section { margin-bottom: 64px; }
+.section-title { font-size: 10px; letter-spacing: 0.25em; color: rgba(200,220,232,0.35); text-transform: uppercase; margin-bottom: 24px; border-bottom: 1px solid rgba(0,180,140,0.15); padding-bottom: 12px; }
+
+.grid { display: flex; flex-wrap: wrap; gap: 16px; }
+
+.card {
+  background: #090f15;
+  border: 1px solid rgba(0,180,140,0.15);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.card-label { font-size: 9px; letter-spacing: 0.15em; color: rgba(200,220,232,0.35); text-transform: uppercase; }
+
+.card-dark { background: #050a0e; }
+.card-light { background: #e8f4f0; }
+.card-mid { background: #0d2028; }
+
+.dl-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #00ffa0;
+  background: none;
+  border: 1px solid rgba(0,255,160,0.2);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dl-btn:hover { background: rgba(0,255,160,0.08); border-color: #00ffa0; }
+
+.meta-block {
+  background: #090f15;
+  border: 1px solid rgba(0,180,140,0.15);
+  padding: 24px 32px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #00dcff;
+  white-space: pre;
+  overflow-x: auto;
+}
+.meta-block .tag { color: rgba(200,220,232,0.5); }
+.meta-block .attr { color: #00ffa0; }
+.meta-block .val { color: #ffd080; }
+</style>
+</head>
+<body>
+
+<h1>Game of Life — Brand Assets</h1>
+
+<!-- LOGOS -->
+<div class="section">
+  <div class="section-title">Logo Variants</div>
+  <div class="grid">
+
+    <!-- Logo A: Glider icon + wordmark -->
+    <div class="card card-dark">
+      <svg width="200" height="72" viewBox="0 0 200 72" fill="none" xmlns="http://www.w3.org/2000/svg" id="logo-a">
+        <!-- Glider pattern: 3x3 -->
+        <rect x="0"  y="12" width="16" height="16" fill="#00ffa0"/>
+        <rect x="20" y="12" width="16" height="16" fill="#00ffa0" opacity="0.3"/>
+        <rect x="40" y="12" width="16" height="16" fill="#00ffa0"/>
+        <rect x="0"  y="32" width="16" height="16" fill="#00ffa0" opacity="0.3"/>
+        <rect x="20" y="32" width="16" height="16" fill="#00dcff"/>
+        <rect x="40" y="32" width="16" height="16" fill="#00ffa0"/>
+        <rect x="0"  y="52" width="16" height="16" fill="#00ffa0"/>
+        <rect x="20" y="52" width="16" height="16" fill="#00ffa0"/>
+        <rect x="40" y="52" width="16" height="16" fill="#00ffa0" opacity="0.3"/>
+        <!-- Glow rects (simulate) -->
+        <rect x="0"  y="12" width="16" height="16" fill="#00ffa0" opacity="0.15"/>
+        <!-- Wordmark -->
+        <text x="68" y="36" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="18" fill="#e8f4f0" letter-spacing="-0.5">GAME</text>
+        <text x="68" y="58" font-family="'JetBrains Mono', monospace" font-weight="300" font-size="14" fill="#00dcff" letter-spacing="4">OF LIFE</text>
+      </svg>
+      <div class="card-label">Logo A — Glider + Wordmark</div>
+      <button class="dl-btn" onclick="downloadSVG('logo-a', 'game-of-life-logo-a.svg')">↓ SVG</button>
+    </div>
+
+    <!-- Logo B: Grid icon minimal -->
+    <div class="card card-dark">
+      <svg width="200" height="72" viewBox="0 0 200 72" fill="none" xmlns="http://www.w3.org/2000/svg" id="logo-b">
+        <!-- 4x4 grid with GoL pattern -->
+        <rect x="0"  y="8"  width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="18" y="8"  width="14" height="14" fill="#00ffa0"/>
+        <rect x="36" y="8"  width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="54" y="8"  width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="0"  y="26" width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="18" y="26" width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="36" y="26" width="14" height="14" fill="#00dcff"/>
+        <rect x="54" y="26" width="14" height="14" fill="#00ffa0"/>
+        <rect x="0"  y="44" width="14" height="14" fill="#00ffa0"/>
+        <rect x="18" y="44" width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <rect x="36" y="44" width="14" height="14" fill="#00ffa0"/>
+        <rect x="54" y="44" width="14" height="14" fill="#00ffa0" opacity="0.15"/>
+        <!-- Grid lines -->
+        <line x1="0" y1="8" x2="68" y2="8" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="0" y1="26" x2="68" y2="26" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="0" y1="44" x2="68" y2="44" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="0" y1="58" x2="68" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="0" y1="8" x2="0" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="18" y1="8" x2="18" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="36" y1="8" x2="36" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="54" y1="8" x2="54" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <line x1="68" y1="8" x2="68" y2="58" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <!-- Wordmark stacked -->
+        <text x="82" y="30" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="16" fill="#00ffa0" letter-spacing="1">GAME OF</text>
+        <text x="82" y="52" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="22" fill="#e8f4f0" letter-spacing="-1">LIFE</text>
+      </svg>
+      <div class="card-label">Logo B — Grid + Bold</div>
+      <button class="dl-btn" onclick="downloadSVG('logo-b', 'game-of-life-logo-b.svg')">↓ SVG</button>
+    </div>
+
+    <!-- Logo C: Minimal mark only -->
+    <div class="card card-dark">
+      <svg width="120" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" id="logo-c">
+        <!-- Glider — iconic 5-cell pattern -->
+        <rect x="4"  y="4"  width="20" height="20" fill="rgba(0,220,255,0.08)" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <rect x="28" y="4"  width="20" height="20" fill="#00ffa0"/>
+        <rect x="52" y="4"  width="20" height="20" fill="rgba(0,220,255,0.08)" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <rect x="4"  y="28" width="20" height="20" fill="rgba(0,220,255,0.08)" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <rect x="28" y="28" width="20" height="20" fill="rgba(0,220,255,0.08)" stroke="rgba(0,220,255,0.2)" stroke-width="0.5"/>
+        <rect x="52" y="28" width="20" height="20" fill="#00ffa0"/>
+        <rect x="4"  y="52" width="20" height="20" fill="#00ffa0"/>
+        <rect x="28" y="52" width="20" height="20" fill="#00ffa0"/>
+        <rect x="52" y="52" width="20" height="20" fill="#00ffa0"/>
+        <!-- glow -->
+        <rect x="28" y="4"  width="20" height="20" fill="#00ffa0" opacity="0.2" rx="0"/>
+      </svg>
+      <div class="card-label">Logo C — Mark Only (Glider)</div>
+      <button class="dl-btn" onclick="downloadSVG('logo-c', 'game-of-life-mark.svg')">↓ SVG</button>
+    </div>
+
+    <!-- Logo D: Light version -->
+    <div class="card card-light">
+      <svg width="200" height="72" viewBox="0 0 200 72" fill="none" xmlns="http://www.w3.org/2000/svg" id="logo-d">
+        <rect x="0"  y="12" width="16" height="16" fill="#007a50"/>
+        <rect x="20" y="12" width="16" height="16" fill="#007a50" opacity="0.25"/>
+        <rect x="40" y="12" width="16" height="16" fill="#007a50"/>
+        <rect x="0"  y="32" width="16" height="16" fill="#007a50" opacity="0.25"/>
+        <rect x="20" y="32" width="16" height="16" fill="#005d7a"/>
+        <rect x="40" y="32" width="16" height="16" fill="#007a50"/>
+        <rect x="0"  y="52" width="16" height="16" fill="#007a50"/>
+        <rect x="20" y="52" width="16" height="16" fill="#007a50"/>
+        <rect x="40" y="52" width="16" height="16" fill="#007a50" opacity="0.25"/>
+        <text x="68" y="36" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="18" fill="#0a1a14" letter-spacing="-0.5">GAME</text>
+        <text x="68" y="58" font-family="'JetBrains Mono', monospace" font-weight="300" font-size="14" fill="#005d7a" letter-spacing="4">OF LIFE</text>
+      </svg>
+      <div class="card-label" style="color:#333;">Logo D — Light Version</div>
+      <button class="dl-btn" onclick="downloadSVG('logo-d', 'game-of-life-logo-light.svg')">↓ SVG</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- FAVICON SIZES -->
+<div class="section">
+  <div class="section-title">Favicon &amp; App Icons</div>
+  <div class="grid" id="favicon-grid">
+    <!-- generated by JS -->
+  </div>
+</div>
+
+<!-- OG IMAGE -->
+<div class="section">
+  <div class="section-title">Open Graph Image (1200×630)</div>
+  <div style="position:relative; display:inline-block;">
+    <canvas id="og-canvas" width="1200" height="630" style="width:600px; height:315px; display:block; border:1px solid rgba(0,180,140,0.2);"></canvas>
+    <div style="margin-top:12px; display:flex; gap:12px;">
+      <button class="dl-btn" onclick="downloadCanvas('og-canvas','game-of-life-og.png')">↓ PNG (1200×630)</button>
+    </div>
+  </div>
+</div>
+
+<!-- META TAGS -->
+<div class="section">
+  <div class="section-title">Meta Tags — Copy &amp; Paste</div>
+  <div class="meta-block" id="meta-block"></div>
+</div>
+
+<script>
+// ── Logo C SVG mark (for canvas rendering)
+const MARK_CELLS = [
+  [1,0],[0,1],[2,1],[0,2],[1,2],[2,2] // glider
+];
+
+// ── Draw favicon at size N
+function drawFavicon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  const S = size;
+  ctx.clearRect(0, 0, S, S);
+
+  // Background
+  ctx.fillStyle = '#050a0e';
+  ctx.fillRect(0, 0, S, S);
+
+  // Border glow
+  ctx.strokeStyle = 'rgba(0,255,160,0.3)';
+  ctx.lineWidth = S * 0.04;
+  ctx.strokeRect(S*0.02, S*0.02, S*0.96, S*0.96);
+
+  // Draw glider on 3x3 grid
+  const GRID = 3;
+  const pad = S * 0.12;
+  const cellS = (S - pad*2) / GRID;
+
+  const CELLS = [[1,0],[2,1],[0,2],[1,2],[2,2]]; // glider
+  CELLS.forEach(([cx, cy]) => {
+    const px = pad + cx * cellS;
+    const py = pad + cy * cellS;
+    const cs = cellS * 0.82;
+    ctx.shadowColor = '#00ffa0';
+    ctx.shadowBlur = S * 0.08;
+    ctx.fillStyle = '#00ffa0';
+    ctx.fillRect(px, py, cs, cs);
+    ctx.shadowBlur = 0;
+  });
+
+  // Dead cells — very faint
+  for (let gy = 0; gy < GRID; gy++) {
+    for (let gx = 0; gx < GRID; gx++) {
+      if (CELLS.some(([cx,cy]) => cx===gx && cy===gy)) continue;
+      const px = pad + gx * cellS;
+      const py = pad + gy * cellS;
+      const cs = cellS * 0.82;
+      ctx.fillStyle = 'rgba(0,180,120,0.08)';
+      ctx.fillRect(px, py, cs, cs);
+    }
+  }
+}
+
+// ── Generate favicon grid
+const sizes = [16, 32, 48, 64, 128, 180, 192, 512];
+const grid = document.getElementById('favicon-grid');
+sizes.forEach(size => {
+  const card = document.createElement('div');
+  card.className = 'card card-dark';
+  const cv = document.createElement('canvas');
+  cv.width = size; cv.height = size;
+  cv.style.cssText = `width:${Math.min(size,96)}px; height:${Math.min(size,96)}px; image-rendering:pixelated;`;
+  drawFavicon(cv, size);
+  const label = document.createElement('div');
+  label.className = 'card-label';
+  label.textContent = `${size}×${size}`;
+  const btn = document.createElement('button');
+  btn.className = 'dl-btn';
+  btn.textContent = '↓ PNG';
+  btn.onclick = () => downloadCanvas(cv, `favicon-${size}.png`);
+  card.appendChild(cv);
+  card.appendChild(label);
+  card.appendChild(btn);
+  grid.appendChild(card);
+});
+
+// ── Draw OG Image
+function drawOG() {
+  const cv = document.getElementById('og-canvas');
+  const ctx = cv.getContext('2d');
+  const W = 1200, H = 630;
+
+  // Background
+  ctx.fillStyle = '#050a0e';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,180,120,0.07)';
+  ctx.lineWidth = 1;
+  const CELL = 30;
+  for (let x = 0; x <= W; x += CELL) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += CELL) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  // Scanlines
+  for (let y = 0; y < H; y += 3) {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, y, W, 1);
+  }
+
+  // Glider Gun pattern (simplified) — scattered cells as background
+  const RAND_CELLS = [];
+  for (let i = 0; i < 280; i++) {
+    RAND_CELLS.push([
+      Math.floor(Math.random() * (W/CELL)),
+      Math.floor(Math.random() * (H/CELL))
+    ]);
+  }
+  RAND_CELLS.forEach(([gx, gy]) => {
+    const px = gx * CELL + 2;
+    const py = gy * CELL + 2;
+    const s = CELL - 4;
+    const alpha = 0.15 + Math.random() * 0.25;
+    ctx.shadowColor = '#00ffa0';
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = `rgba(0,255,160,${alpha})`;
+    ctx.fillRect(px, py, s, s);
+    ctx.shadowBlur = 0;
+  });
+
+  // Center vignette overlay
+  const vig = ctx.createRadialGradient(W/2, H/2, 80, W/2, H/2, W*0.6);
+  vig.addColorStop(0, 'rgba(5,10,14,0.0)');
+  vig.addColorStop(0.5, 'rgba(5,10,14,0.4)');
+  vig.addColorStop(1, 'rgba(5,10,14,0.92)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, W, H);
+
+  // Big logo mark — centered left side
+  const markSize = 160;
+  const markX = W/2 - 280;
+  const markY = H/2 - markSize/2 - 20;
+  const GRID_N = 3;
+  const CS = markSize / GRID_N;
+  const GLIDER = [[1,0],[2,1],[0,2],[1,2],[2,2]];
+  GLIDER.forEach(([gx,gy]) => {
+    ctx.shadowColor = '#00ffa0';
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = '#00ffa0';
+    ctx.fillRect(markX + gx*CS + 2, markY + gy*CS + 2, CS-4, CS-4);
+    ctx.shadowBlur = 0;
+  });
+  // dead cells in mark
+  for (let gy=0;gy<GRID_N;gy++) for (let gx=0;gx<GRID_N;gx++) {
+    if (GLIDER.some(([cx,cy])=>cx===gx&&cy===gy)) continue;
+    ctx.fillStyle = 'rgba(0,180,120,0.1)';
+    ctx.fillRect(markX+gx*CS+2, markY+gy*CS+2, CS-4, CS-4);
+  }
+
+  // Text
+  ctx.textAlign = 'left';
+  ctx.font = '800 88px JetBrains Mono, monospace';
+  ctx.fillStyle = '#e8f4f0';
+  ctx.fillText('GAME', W/2 - 60, H/2 - 18);
+
+  ctx.font = '300 52px JetBrains Mono, monospace';
+  ctx.fillStyle = '#00dcff';
+  ctx.letterSpacing = '8px';
+  ctx.fillText('OF LIFE', W/2 - 60, H/2 + 50);
+
+  ctx.font = '400 18px JetBrains Mono, monospace';
+  ctx.fillStyle = 'rgba(0,255,160,0.6)';
+  ctx.fillText("CONWAY'S CELLULAR AUTOMATON · 1970", W/2 - 60, H/2 + 100);
+
+  // Bottom border line
+  ctx.strokeStyle = 'rgba(0,255,160,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(60, H-40); ctx.lineTo(W-60, H-40); ctx.stroke();
+
+  ctx.font = '400 13px JetBrains Mono, monospace';
+  ctx.fillStyle = 'rgba(200,220,232,0.25)';
+  ctx.fillText('berkayturanci.github.io/Claude-test-game-of-life', 60, H-18);
+}
+
+drawOG();
+
+// ── Download helpers
+function downloadSVG(idOrEl, filename) {
+  const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  const data = new XMLSerializer().serializeToString(el);
+  const blob = new Blob([data], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function downloadCanvas(idOrEl, filename) {
+  const cv = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  cv.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  });
+}
+
+// ── Meta tags
+const meta = `<span class="tag">&lt;!-- Primary Meta --&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"description"</span> <span class="attr">content</span>=<span class="val">"Conway's Game of Life — a zero-player cellular automaton where complex patterns emerge from simple rules."</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"theme-color"</span> <span class="attr">content</span>=<span class="val">"#050a0e"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"icon"</span> <span class="attr">type</span>=<span class="val">"image/png"</span> <span class="attr">sizes</span>=<span class="val">"32x32"</span> <span class="attr">href</span>=<span class="val">"/favicon-32.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"icon"</span> <span class="attr">type</span>=<span class="val">"image/png"</span> <span class="attr">sizes</span>=<span class="val">"16x16"</span> <span class="attr">href</span>=<span class="val">"/favicon-16.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"apple-touch-icon"</span> <span class="attr">sizes</span>=<span class="val">"180x180"</span> <span class="attr">href</span>=<span class="val">"/apple-touch-icon.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"manifest"</span> <span class="attr">href</span>=<span class="val">"/site.webmanifest"</span><span class="tag">&gt;</span>
+
+<span class="tag">&lt;!-- Open Graph --&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:type"</span> <span class="attr">content</span>=<span class="val">"website"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:url"</span> <span class="attr">content</span>=<span class="val">"https://berkayturanci.github.io/Claude-test-game-of-life/"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:title"</span> <span class="attr">content</span>=<span class="val">"Game of Life"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:description"</span> <span class="attr">content</span>=<span class="val">"A zero-player game where life emerges from simple rules. Watch patterns evolve, collide, and multiply."</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:image"</span> <span class="attr">content</span>=<span class="val">"https://berkayturanci.github.io/Claude-test-game-of-life/og.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:image:width"</span> <span class="attr">content</span>=<span class="val">"1200"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:image:height"</span> <span class="attr">content</span>=<span class="val">"630"</span><span class="tag">&gt;</span>
+
+<span class="tag">&lt;!-- Twitter / X --&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:card"</span> <span class="attr">content</span>=<span class="val">"summary_large_image"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:title"</span> <span class="attr">content</span>=<span class="val">"Game of Life"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:description"</span> <span class="attr">content</span>=<span class="val">"A zero-player game where life emerges from simple rules."</span><span class="tag">&gt;</span>
+<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:image"</span> <span class="attr">content</span>=<span class="val">"https://berkayturanci.github.io/Claude-test-game-of-life/og.png"</span><span class="tag">&gt;</span>`;
+
+document.getElementById('meta-block').innerHTML = meta;
+</script>
+</body>
+</html>
