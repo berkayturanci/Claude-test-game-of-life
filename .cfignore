@@ -1,0 +1,14 @@
+# Exclude files/directories from Cloudflare Pages deployment
+# Keep: index.html, brand-assets.html, site.webmanifest, styles/, src/, assets/
+
+node_modules/
+agents/
+tests/
+.github/
+.claude/
+package.json
+package-lock.json
+CLAUDE.md
+README.md
+AGENTS.md
+*.md
