@@ -127,6 +127,33 @@ All colours are CSS custom properties on `:root`. Change only those variables to
 | `C` | Clear |
 | `G` | Toggle grid |
 
+## Commit conventions
+
+Use the `type(scope): description` format from Conventional Commits:
+
+| Type | When to use |
+|---|---|
+| `feat` | New feature or behaviour |
+| `fix` | Bug fix |
+| `perf` | Performance improvement |
+| `test` | Adding or updating tests |
+| `docs` | Documentation only |
+| `refactor` | Code restructure, no behaviour change |
+| `chore` | Tooling, config, CI changes |
+| `ci` | GitHub Actions / workflow changes |
+
+Examples: `feat: add Pulsar pattern`, `fix: wrap-around off-by-one on resize`, `perf: skip redraw when no cells changed`
+
+## Testing
+
+Tests live in `tests/` and run with Vitest (`npm test`).
+
+- Write tests in **Arrange → Act → Assert** order.
+- Name tests as full sentences: `"dead cell with exactly 3 neighbours becomes alive"`.
+- Target **≥ 80 % branch coverage** for `src/game.js` (pure logic, easy to cover).
+- Do not test the canvas API or DOM — unit-test the `GameOfLife` class only.
+- Run `npm test` before pushing any change to `src/game.js`.
+
 ## Agent safety rules — preventing file overwrite (ezilme)
 
 These rules exist because PR #11 overwrote a major redesign (commits `523c3c4`, `61753e8`, `b776307`) that was pushed to main after the agent's session started. Follow them on every task.
