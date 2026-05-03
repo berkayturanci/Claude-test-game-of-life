@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Disable user scaling so the game feels native on iOS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- iOS home-screen app appearance -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Conway's Game of Life</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       Landing / intro screen
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="landing" aria-label="Game introduction">
+
+    <!-- Full-screen background simulation canvas -->
+    <canvas id="landing-bg" aria-hidden="true"></canvas>
+
+    <!-- Centred content card -->
+    <div class="landing-content">
+
+      <h1 class="landing-title">Conway's<br>Game&nbsp;of&nbsp;Life</h1>
+
+      <p class="landing-subtitle">A zero-player game that evolves from an initial state.</p>
+
+      <!-- Rule cards -->
+      <div class="rule-cards">
+
+        <div class="rule-card">
+          <canvas id="card-canvas-1" class="rule-canvas" aria-hidden="true"></canvas>
+          <h2 class="rule-title">Underpopulation</h2>
+          <p class="rule-desc">A live cell with fewer than&nbsp;2 live neighbours&nbsp;dies.</p>
+        </div>
+
+        <div class="rule-card">
+          <canvas id="card-canvas-2" class="rule-canvas" aria-hidden="true"></canvas>
+          <h2 class="rule-title">Survival</h2>
+          <p class="rule-desc">A live cell with 2 or&nbsp;3 live neighbours&nbsp;lives on.</p>
+        </div>
+
+        <div class="rule-card">
+          <canvas id="card-canvas-3" class="rule-canvas" aria-hidden="true"></canvas>
+          <h2 class="rule-title">Overpopulation</h2>
+          <p class="rule-desc">A live cell with more than&nbsp;3 live neighbours&nbsp;dies.</p>
+        </div>
+
+      </div><!-- /.rule-cards -->
+
+      <!-- Pattern types showcase -->
+      <div class="pattern-showcase">
+        <p class="showcase-label">Load classic patterns from the in-game Patterns menu</p>
+        <div class="pattern-type-cards">
+
+          <div class="pattern-type-card">
+            <canvas id="demo-canvas-1" class="demo-canvas" aria-hidden="true"></canvas>
+            <strong class="pattern-type-name">Still Life</strong>
+            <p class="pattern-type-desc">Stable forever — never changes.</p>
+          </div>
+
+          <div class="pattern-type-card">
+            <canvas id="demo-canvas-2" class="demo-canvas" aria-hidden="true"></canvas>
+            <strong class="pattern-type-name">Oscillator</strong>
+            <p class="pattern-type-desc">Repeats on a fixed cycle.</p>
+          </div>
+
+          <div class="pattern-type-card">
+            <canvas id="demo-canvas-3" class="demo-canvas" aria-hidden="true"></canvas>
+            <strong class="pattern-type-name">Spaceship</strong>
+            <p class="pattern-type-desc">Travels across the grid forever.</p>
+          </div>
+
+          <div class="pattern-type-card pattern-type-card--wide">
+            <canvas id="demo-canvas-4" class="demo-canvas" aria-hidden="true"></canvas>
+            <strong class="pattern-type-name">Gun</strong>
+            <p class="pattern-type-desc">Fires an endless stream of spaceships.</p>
+          </div>
+
+        </div>
+      </div><!-- /.pattern-showcase -->
+
+      <button id="landing-play" class="landing-btn" aria-label="Start the game">
+        Play
+      </button>
+
+    </div><!-- /.landing-content -->
+
+  </div><!-- /#landing -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       Game (hidden until landing transition completes)
+       ══════════════════════════════════════════════════════════════════════ -->
+  <div id="app" style="display:none;">
+
+    <header>
+      <h1>Game&nbsp;of&nbsp;Life</h1>
+      <div class="stats">
+        <span>Gen&nbsp;<b id="stat-gen">0</b></span>
+        <span>Pop&nbsp;<b id="stat-pop">0</b></span>
+      </div>
+    </header>
+
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <div id="controls">
+      <div class="btn-row">
+        <button id="btn-play"  aria-label="Play">▶</button>
+        <button id="btn-step"  aria-label="Step one generation">Step</button>
+        <button id="btn-rand"  aria-label="Randomize">Rand</button>
+        <button id="btn-clear" aria-label="Clear board">Clear</button>
+        <button id="btn-grid"  aria-label="Toggle grid" class="active">Grid</button>
+        <select id="pattern-select" aria-label="Load preset pattern">
+          <option value="" disabled selected>Patterns ▾</option>
+          <option value="0">Glider</option>
+          <option value="1">Gosper Glider Gun</option>
+          <option value="2">Lightweight Spaceship</option>
+          <option value="3">Pulsar</option>
+          <option value="4">Blinker</option>
+          <option value="5">Toad</option>
+          <option value="6">Beacon</option>
+          <option value="7">Block</option>
+          <option value="8">R-pentomino</option>
+          <option value="9">Diehard</option>
+          <option value="10">Acorn</option>
+        </select>
+      </div>
+      <div class="speed-row">
+        <label for="speed-range">Speed</label>
+        <input id="speed-range" type="range" min="1" max="60" value="10" />
+        <span id="speed-label">10 fps</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!--
+    Keyboard shortcuts:
+      Space       – play / pause
+      → / N       – step one generation (while paused)
+      R           – randomize
+      C           – clear
+      G           – toggle grid
+  -->
+  <script type="module">
+    import { initLanding } from './src/landing.js';
+
+    // initGame is imported lazily so the game module only runs after the
+    // landing transition completes and #app is visible (so canvas resize works).
+    initLanding(async () => {
+      // Make the game shell visible before initialising
+      const app = document.getElementById('app');
+      app.style.display = '';        // remove inline display:none
+
+      // Small rAF delay so the browser paints #app before we resize its canvas
+      requestAnimationFrame(() => {
+        requestAnimationFrame(async () => {
+          const { init } = await import('./src/app.js');
+          init();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

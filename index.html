@@ -1,124 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Disable user scaling so the game feels native on iOS -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <!-- iOS home-screen app appearance -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>Conway's Game of Life</title>
-  <link rel="stylesheet" href="styles/main.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050a0e" />
+<title>Conway's Game of Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #050a0e;
+    --bg2: #090f15;
+    --neon-green: oklch(0.75 0.22 145);
+    --neon-cyan: oklch(0.75 0.18 195);
+    --neon-green-dim: oklch(0.45 0.15 145);
+    --text: oklch(0.88 0.03 195);
+    --text-dim: oklch(0.55 0.04 195);
+    --border: oklch(0.25 0.06 195);
+    --grid-color: oklch(0.18 0.05 195);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* SCANLINE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      oklch(0.0 0 0 / 0.06) 2px, oklch(0.0 0 0 / 0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid oklch(0.2 0.06 195 / 0.4);
+    backdrop-filter: blur(12px);
+    background: oklch(0.04 0.02 195 / 0.7);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon-green);
+    text-shadow: 0 0 20px var(--neon-green);
+  }
+  .nav-logo span { color: var(--text-dim); font-weight: 300; }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--neon-cyan); }
+
+  /* HERO */
+  #hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  #life-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.38;
+  }
+
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--neon-green);
+    text-shadow: 0 0 12px var(--neon-green);
+    border: 1px solid oklch(0.45 0.18 145 / 0.4);
+    padding: 6px 16px;
+    animation: fadeIn 1s ease both;
+  }
+
+  .hero-title {
+    font-family: var(--mono);
+    font-size: clamp(52px, 8vw, 108px);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-shadow: 0 0 60px oklch(0.75 0.22 145 / 0.3), 0 0 120px oklch(0.75 0.22 145 / 0.1);
+    animation: fadeSlideUp 1s 0.2s ease both;
+  }
+  .hero-title .green { color: var(--neon-green); text-shadow: 0 0 40px var(--neon-green); }
+  .hero-title .cyan  { color: var(--neon-cyan);  text-shadow: 0 0 40px var(--neon-cyan); }
+
+  @keyframes glitch {
+    0%, 90%, 100% { transform: none; text-shadow: 0 0 60px oklch(0.75 0.22 145 / 0.3), 0 0 120px oklch(0.75 0.22 145 / 0.1); }
+    92% { transform: translateX(-3px) skewX(-1deg); text-shadow: -3px 0 var(--neon-cyan), 3px 0 oklch(0.7 0.2 345 / 0.5); }
+    94% { transform: translateX(3px) skewX(1deg);  text-shadow: 3px 0 var(--neon-green), -3px 0 oklch(0.7 0.2 345 / 0.5); }
+    96% { transform: none; text-shadow: 0 0 60px oklch(0.75 0.22 145 / 0.3), 0 0 120px oklch(0.75 0.22 145 / 0.1); }
+  }
+  .glitch-animate { animation: glitch 6s infinite; }
+
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: clamp(16px, 1.8vw, 20px);
+    font-weight: 400;
+    color: oklch(0.78 0.04 195);
+    max-width: 520px;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+    animation: fadeSlideUp 1s 0.4s ease both;
+    text-shadow: 0 1px 12px oklch(0.04 0.02 195 / 0.8);
+    background: oklch(0.04 0.02 195 / 0.35);
+    padding: 14px 20px;
+    border-left: 2px solid oklch(0.75 0.18 195 / 0.5);
+  }
+
+  .hero-cta { display: flex; gap: 16px; align-items: center; animation: fadeSlideUp 1s 0.6s ease both; }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--neon-green);
+    border: none;
+    padding: 16px 36px;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--neon-cyan);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover { box-shadow: 0 0 40px oklch(0.75 0.18 195 / 0.6); }
+
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:hover { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+  .hero-stats { display: flex; gap: 40px; animation: fadeSlideUp 1s 0.8s ease both; }
+  .stat { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--neon-green);
+    text-shadow: 0 0 16px var(--neon-green);
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: fadeIn 2s 1.5s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--neon-green), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  .scroll-text { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+
+  /* SECTION COMMON */
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 12px var(--neon-cyan);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-tag::before { content: ''; width: 32px; height: 1px; background: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 60px;
+  }
+
+  /* RULES */
+  #rules {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 120px 48px;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .rule-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .rule-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, oklch(0.75 0.22 145 / 0.03), transparent 60%);
+    pointer-events: none;
+  }
+  .rule-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon-green), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s;
+  }
+  .rule-card:hover { border-color: var(--neon-green-dim); }
+  .rule-card:hover::after { transform: scaleX(1); }
+
+  .rule-number {
+    font-family: var(--mono);
+    font-size: 72px;
+    font-weight: 800;
+    color: oklch(0.18 0.06 195);
+    line-height: 1;
+    margin-bottom: 24px;
+    letter-spacing: -0.04em;
+    user-select: none;
+  }
+  .rule-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+    margin-bottom: 12px;
+  }
+  .rule-title { font-family: var(--sans); font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 16px; line-height: 1.2; }
+  .rule-desc  { font-family: var(--sans); font-size: 15px; font-weight: 300; color: var(--text-dim); line-height: 1.7; }
+
+  .rule-canvas-wrap { position: absolute; top: 24px; right: 24px; opacity: 0.5; transition: opacity 0.3s; }
+  .rule-card:hover .rule-canvas-wrap { opacity: 1; }
+  .rule-mini-canvas { display: block; }
+
+  /* HOW TO PLAY */
+  #howto { padding: 120px 48px; }
+
+  .steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+  .step {
+    background: oklch(0.08 0.03 195 / 0.5);
+    border: 1px solid var(--border);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .step::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon-green), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s;
+  }
+  .step:hover::after { transform: scaleX(1); }
+
+  .step-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--neon-cyan); margin-bottom: 20px; }
+  .step-icon { width: 44px; height: 44px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; }
+  .step-title { font-family: var(--sans); font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+  .step-desc  { font-family: var(--sans); font-size: 14px; font-weight: 300; color: var(--text-dim); line-height: 1.7; }
+
+  /* CTA */
+  #cta {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 160px 48px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  #cta-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.3; }
+
+  .cta-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .cta-title { font-family: var(--mono); font-size: clamp(40px, 6vw, 80px); font-weight: 800; line-height: 0.95; letter-spacing: -0.02em; }
+  .cta-title .line2 { color: var(--neon-green); text-shadow: 0 0 40px var(--neon-green); }
+  .cta-sub { font-family: var(--sans); font-size: 16px; font-weight: 300; color: var(--text-dim); max-width: 400px; line-height: 1.6; }
+
+  .btn-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--neon-green);
+    border: none;
+    padding: 22px 56px;
+    cursor: pointer;
+    text-decoration: none;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    transition: all 0.3s;
+  }
+  .btn-large:hover { background: var(--neon-cyan); box-shadow: 0 0 60px oklch(0.75 0.18 195 / 0.5); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-text { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text-dim); }
+  .footer-copy { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: oklch(0.3 0.04 195); }
+
+  /* LIVE INDICATOR */
+  .live-indicator { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text-dim); }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); animation: pulseDot 1.5s infinite; }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scrollPulse { 0%, 100% { opacity: 0.3; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.2); } }
+  @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    #rules, #howto, #cta { padding: 80px 20px; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .steps-row  { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       Landing / intro screen
-       ══════════════════════════════════════════════════════════════════════ -->
-  <div id="landing" aria-label="Game introduction">
+<nav>
+  <div class="nav-logo">GAME <span>of</span> LIFE</div>
+  <ul class="nav-links">
+    <li><a href="#rules">Rules</a></li>
+    <li><a href="#howto">How to Play</a></li>
+    <li><a href="./game.html">Play Now</a></li>
+  </ul>
+</nav>
 
-    <!-- Full-screen background simulation canvas -->
-    <canvas id="landing-bg" aria-hidden="true"></canvas>
-
-    <!-- Centred content card -->
-    <div class="landing-content">
-
-      <h1 class="landing-title">Conway's<br>Game&nbsp;of&nbsp;Life</h1>
-
-      <p class="landing-subtitle">A zero-player game that evolves from an initial state.</p>
-
-      <!-- Rule cards -->
-      <div class="rule-cards">
-
-        <div class="rule-card">
-          <canvas id="card-canvas-1" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Underpopulation</h2>
-          <p class="rule-desc">A live cell with fewer than&nbsp;2 live neighbours&nbsp;dies.</p>
-        </div>
-
-        <div class="rule-card">
-          <canvas id="card-canvas-2" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Survival</h2>
-          <p class="rule-desc">A live cell with 2 or&nbsp;3 live neighbours&nbsp;lives on.</p>
-        </div>
-
-        <div class="rule-card">
-          <canvas id="card-canvas-3" class="rule-canvas" aria-hidden="true"></canvas>
-          <h2 class="rule-title">Overpopulation</h2>
-          <p class="rule-desc">A live cell with more than&nbsp;3 live neighbours&nbsp;dies.</p>
-        </div>
-
-      </div><!-- /.rule-cards -->
-
-      <button id="landing-play" class="landing-btn" aria-label="Start the game">
-        Play
-      </button>
-
-    </div><!-- /.landing-content -->
-
-  </div><!-- /#landing -->
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       Game (hidden until landing transition completes)
-       ══════════════════════════════════════════════════════════════════════ -->
-  <div id="app" style="display:none;">
-
-    <header>
-      <h1>Game&nbsp;of&nbsp;Life</h1>
-      <div class="stats">
-        <span>Gen&nbsp;<b id="stat-gen">0</b></span>
-        <span>Pop&nbsp;<b id="stat-pop">0</b></span>
-      </div>
-    </header>
-
-    <div id="canvas-wrap">
-      <canvas id="game-canvas"></canvas>
+<!-- HERO -->
+<section id="hero">
+  <div class="grid-lines"></div>
+  <canvas id="life-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">Conway's Cellular Automaton · 1970</div>
+    <h1 class="hero-title glitch-animate">
+      GAME<br><span class="green">OF</span> <span class="cyan">LIFE</span>
+    </h1>
+    <p class="hero-sub">
+      A zero-player game where life emerges from simple rules.
+      Watch patterns evolve, collide, and multiply in real time.
+    </p>
+    <div class="hero-cta">
+      <a href="./game.html" class="btn-primary">
+        <span>▶ Play Now</span>
+      </a>
+      <a href="#rules" class="btn-secondary">Learn the Rules</a>
     </div>
-
-    <div id="controls">
-      <div class="btn-row">
-        <button id="btn-play"  aria-label="Play">▶</button>
-        <button id="btn-step"  aria-label="Step one generation">Step</button>
-        <button id="btn-rand"  aria-label="Randomize">Rand</button>
-        <button id="btn-clear" aria-label="Clear board">Clear</button>
-        <button id="btn-grid"  aria-label="Toggle grid" class="active">Grid</button>
-      </div>
-      <div class="speed-row">
-        <label for="speed-range">Speed</label>
-        <input id="speed-range" type="range" min="1" max="60" value="10" />
-        <span id="speed-label">10 fps</span>
-      </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" id="cell-count">0</span><span class="stat-label">Live Cells</span></div>
+      <div class="stat"><span class="stat-num" id="gen-count">0</span><span class="stat-label">Generation</span></div>
+      <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Possibilities</span></div>
     </div>
-
   </div>
+  <div class="hero-scroll">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
 
-  <!--
-    Keyboard shortcuts:
-      Space       – play / pause
-      → / N       – step one generation (while paused)
-      R           – randomize
-      C           – clear
-      G           – toggle grid
-  -->
-  <script type="module">
-    import { initLanding } from './src/landing.js';
+<!-- RULES -->
+<section id="rules">
+  <div style="max-width:1200px; margin:0 auto;">
+    <div class="section-tag">The Four Laws</div>
+    <h2 class="section-title">Rules of Existence</h2>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-canvas-wrap"><canvas class="rule-mini-canvas" id="rc1" width="100" height="100"></canvas></div>
+        <div class="rule-number">01</div>
+        <div class="rule-name">Underpopulation</div>
+        <h3 class="rule-title">Fewer than 2 neighbors?<br>Cell dies.</h3>
+        <p class="rule-desc">A live cell with 0 or 1 live neighbours dies, as if by loneliness. Life needs community to survive.</p>
+      </div>
+      <div class="rule-card">
+        <div class="rule-canvas-wrap"><canvas class="rule-mini-canvas" id="rc2" width="100" height="100"></canvas></div>
+        <div class="rule-number">02</div>
+        <div class="rule-name">Survival</div>
+        <h3 class="rule-title">2 or 3 neighbors?<br>Cell lives on.</h3>
+        <p class="rule-desc">A live cell with 2 or 3 live neighbours survives to the next generation. Balance sustains life.</p>
+      </div>
+      <div class="rule-card">
+        <div class="rule-canvas-wrap"><canvas class="rule-mini-canvas" id="rc3" width="100" height="100"></canvas></div>
+        <div class="rule-number">03</div>
+        <div class="rule-name">Overpopulation</div>
+        <h3 class="rule-title">More than 3 neighbors?<br>Cell dies.</h3>
+        <p class="rule-desc">A live cell with more than 3 live neighbours dies, as if by overcrowding. Even abundance can kill.</p>
+      </div>
+      <div class="rule-card">
+        <div class="rule-canvas-wrap"><canvas class="rule-mini-canvas" id="rc4" width="100" height="100"></canvas></div>
+        <div class="rule-number">04</div>
+        <div class="rule-name">Reproduction</div>
+        <h3 class="rule-title">Exactly 3 neighbors?<br>New life emerges.</h3>
+        <p class="rule-desc">A dead cell with exactly 3 live neighbours becomes alive. Creation from the right conditions.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    // initGame is imported lazily so the game module only runs after the
-    // landing transition completes and #app is visible (so canvas resize works).
-    initLanding(async () => {
-      // Make the game shell visible before initialising
-      const app = document.getElementById('app');
-      app.style.display = '';        // remove inline display:none
+<!-- HOW TO PLAY -->
+<section id="howto">
+  <div style="max-width:1200px; margin:0 auto;">
+    <div class="section-tag">Getting Started</div>
+    <h2 class="section-title">How to Play</h2>
+    <div class="steps-row">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <div class="step-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="4" y="4" width="8" height="8" fill="oklch(0.75 0.22 145)" opacity="0.4"/>
+            <rect x="18" y="4" width="8" height="8" fill="oklch(0.75 0.22 145)"/>
+            <rect x="32" y="4" width="8" height="8" fill="oklch(0.75 0.22 145)" opacity="0.2"/>
+            <rect x="4" y="18" width="8" height="8" fill="oklch(0.75 0.22 145)"/>
+            <rect x="18" y="18" width="8" height="8" fill="oklch(0.75 0.18 195)"/>
+            <rect x="32" y="18" width="8" height="8" fill="oklch(0.75 0.22 145)"/>
+            <rect x="4" y="32" width="8" height="8" fill="oklch(0.75 0.22 145)" opacity="0.2"/>
+            <rect x="18" y="32" width="8" height="8" fill="oklch(0.75 0.22 145)"/>
+            <rect x="32" y="32" width="8" height="8" fill="oklch(0.75 0.22 145)" opacity="0.4"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Draw Your Pattern</h3>
+        <p class="step-desc">Click on any cell in the grid to toggle it alive or dead. Design your initial configuration — this is your seed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <div class="step-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="18" stroke="oklch(0.75 0.22 145)" stroke-width="1.5" opacity="0.4"/>
+            <polygon points="18,15 32,22 18,29" fill="oklch(0.75 0.22 145)"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Start the Simulation</h3>
+        <p class="step-desc">Press Play to begin. Watch as each generation unfolds according to the four rules, creating emergent complexity.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <div class="step-icon">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="4" y="20" width="36" height="4" fill="oklch(0.75 0.22 145)" opacity="0.3"/>
+            <rect x="4" y="20" width="20" height="4" fill="oklch(0.75 0.22 145)"/>
+            <circle cx="24" cy="22" r="5" fill="oklch(0.75 0.18 195)"/>
+            <line x1="6" y1="10" x2="6" y2="34" stroke="oklch(0.55 0.04 195)" stroke-width="1"/>
+            <line x1="38" y1="10" x2="38" y2="34" stroke="oklch(0.55 0.04 195)" stroke-width="1"/>
+          </svg>
+        </div>
+        <h3 class="step-title">Observe &amp; Iterate</h3>
+        <p class="step-desc">Pause, rewind, adjust speed. Experiment with different patterns. Discover gliders, oscillators, and still lifes.</p>
+      </div>
+    </div>
+    <div style="margin-top:48px; padding:32px; border:1px solid var(--border); background:oklch(0.07 0.03 195 / 0.5); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--neon-cyan);margin-bottom:8px;">KNOWN PATTERNS</div>
+        <div style="font-family:var(--sans);font-size:15px;color:var(--text-dim);">Start with a Glider, Blinker, or Gosper Glider Gun — classic patterns included.</div>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div class="live-indicator"><div class="live-dot"></div><span>GLIDER</span></div>
+        <div class="live-indicator"><div class="live-dot" style="background:var(--neon-cyan);box-shadow:0 0 8px var(--neon-cyan);"></div><span>BLINKER</span></div>
+        <div class="live-indicator"><div class="live-dot" style="background:oklch(0.7 0.18 55);box-shadow:0 0 8px oklch(0.7 0.18 55);"></div><span>GLIDER GUN</span></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-      // Small rAF delay so the browser paints #app before we resize its canvas
-      requestAnimationFrame(() => {
-        requestAnimationFrame(async () => {
-          const { init } = await import('./src/app.js');
-          init();
-        });
-      });
-    });
-  </script>
+<!-- CTA -->
+<section id="cta">
+  <canvas id="cta-canvas"></canvas>
+  <div class="cta-content">
+    <div class="hero-tag" style="animation:none;">Ready to Begin?</div>
+    <h2 class="cta-title">BEGIN<br><span class="line2">YOUR UNIVERSE</span></h2>
+    <p class="cta-sub">Every great pattern starts with a single living cell. What will you create?</p>
+    <a href="./game.html" class="btn-large">▶ &nbsp;Launch Game</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-text">GAME OF LIFE · CONWAY'S CELLULAR AUTOMATON</div>
+  <div class="footer-copy">© 2026 · berkayturanci</div>
+</footer>
+
+<script>
+// HERO SIMULATION
+const canvas = document.getElementById('life-canvas');
+const ctx = canvas.getContext('2d');
+const CELL = 12;
+let cols, rows, grid, nextGrid, generation = 0, animFrame, lastTime = 0;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cols = Math.ceil(canvas.width / CELL) + 2;
+  rows = Math.ceil(canvas.height / CELL) + 2;
+  initGrid();
+}
+
+function initGrid() {
+  grid = new Uint8Array(cols * rows);
+  nextGrid = new Uint8Array(cols * rows);
+  for (let i = 0; i < grid.length; i++) grid[i] = Math.random() < 0.40 ? 1 : 0;
+  generation = 0;
+}
+
+function idx(x, y) { return ((y + rows) % rows) * cols + ((x + cols) % cols); }
+
+function step() {
+  let live = 0;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const n = grid[idx(x-1,y-1)]+grid[idx(x,y-1)]+grid[idx(x+1,y-1)]+
+                grid[idx(x-1,y)]                   +grid[idx(x+1,y)]+
+                grid[idx(x-1,y+1)]+grid[idx(x,y+1)]+grid[idx(x+1,y+1)];
+      const a = grid[idx(x,y)];
+      nextGrid[idx(x,y)] = a ? (n===2||n===3?1:0) : (n===3?1:0);
+      if (nextGrid[idx(x,y)]) live++;
+    }
+  }
+  [grid, nextGrid] = [nextGrid, grid];
+  generation++;
+  return live;
+}
+
+function draw(live) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (!grid[idx(x,y)]) continue;
+      const n = grid[idx(x-1,y-1)]+grid[idx(x,y-1)]+grid[idx(x+1,y-1)]+
+                grid[idx(x-1,y)]                   +grid[idx(x+1,y)]+
+                grid[idx(x-1,y+1)]+grid[idx(x,y+1)]+grid[idx(x+1,y+1)];
+      const [r,g,b] = n>=3 ? [0,220,255] : n===2 ? [0,237,207] : [0,255,160];
+      ctx.shadowColor = `rgb(${r},${g},${b})`;
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(x*CELL+1, y*CELL+1, CELL-2, CELL-2);
+      ctx.shadowBlur = 0;
+    }
+  }
+  document.getElementById('cell-count').textContent = live.toLocaleString();
+  document.getElementById('gen-count').textContent = generation.toLocaleString();
+}
+
+let _interval = 150;
+function loop(ts) {
+  animFrame = requestAnimationFrame(loop);
+  if (ts - lastTime < _interval) return;
+  lastTime = ts;
+  const live = step();
+  draw(live);
+  if (live < cols * rows * 0.03) initGrid();
+}
+
+window.addEventListener('resize', resize);
+resize();
+requestAnimationFrame(loop);
+
+// RULE MINI CANVASES
+function drawRuleMini(id, rule) {
+  const rc = document.getElementById(id);
+  if (!rc) return;
+  const rctx = rc.getContext('2d');
+  const S = 20, OFF = 10;
+  const patterns = {
+    underpopulation: [[0,0,0],[0,1,1],[0,0,0]],
+    survival:        [[0,1,0],[0,1,1],[0,0,0]],
+    overpopulation:  [[1,1,1],[1,1,1],[0,0,0]],
+    reproduction:    [[1,0,0],[0,0,1],[1,0,0]]
+  };
+  const pat = patterns[rule];
+  rctx.clearRect(0, 0, 100, 100);
+  for (let ry = 0; ry < 3; ry++) {
+    for (let rx = 0; rx < 3; rx++) {
+      const alive = pat[ry][rx];
+      const px = OFF + rx * (S + 2);
+      const py = OFF + ry * (S + 2);
+      rctx.fillStyle = alive ? '#00ffa0' : '#0d1f2a';
+      rctx.shadowColor = alive ? '#00ffa0' : 'transparent';
+      rctx.shadowBlur = alive ? 6 : 0;
+      rctx.fillRect(px, py, S, S);
+      rctx.shadowBlur = 0;
+    }
+  }
+  rctx.strokeStyle = '#00dcff';
+  rctx.lineWidth = 1.5;
+  rctx.strokeRect(OFF + (S+2), OFF + (S+2), S, S);
+}
+drawRuleMini('rc1','underpopulation');
+drawRuleMini('rc2','survival');
+drawRuleMini('rc3','overpopulation');
+drawRuleMini('rc4','reproduction');
+
+// CTA SIMULATION
+(function() {
+  const cc = document.getElementById('cta-canvas');
+  if (!cc) return;
+  const cctx = cc.getContext('2d');
+  const CC = 24;
+  let ccols, crows, cgrid, cnext;
+  function ctaResize() {
+    cc.width = cc.offsetWidth; cc.height = cc.offsetHeight;
+    ccols = Math.ceil(cc.width/CC)+2; crows = Math.ceil(cc.height/CC)+2;
+    cgrid = new Uint8Array(ccols*crows); cnext = new Uint8Array(ccols*crows);
+    for (let i = 0; i < cgrid.length; i++) cgrid[i] = Math.random()<0.25?1:0;
+  }
+  function ci(x,y){return((y+crows)%crows)*ccols+((x+ccols)%ccols);}
+  let ctaLast = 0;
+  function ctaLoop(ts) {
+    requestAnimationFrame(ctaLoop);
+    if (ts-ctaLast<120) return; ctaLast=ts;
+    let live=0;
+    for(let y=0;y<crows;y++){for(let x=0;x<ccols;x++){
+      let n=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;n+=cgrid[ci(x+dx,y+dy)];}
+      cnext[ci(x,y)]=cgrid[ci(x,y)]?(n===2||n===3?1:0):(n===3?1:0);if(cnext[ci(x,y)])live++;
+    }}
+    [cgrid,cnext]=[cnext,cgrid];
+    if(live<ccols*crows*0.02)ctaResize();
+    cctx.clearRect(0,0,cc.width,cc.height);
+    for(let y=0;y<crows;y++){for(let x=0;x<ccols;x++){
+      if(!cgrid[ci(x,y)])continue;
+      cctx.fillStyle='#00ffa0'; cctx.shadowColor='#00ffa0'; cctx.shadowBlur=10;
+      cctx.fillRect(x*CC+1,y*CC+1,CC-2,CC-2); cctx.shadowBlur=0;
+    }}
+  }
+  ctaResize(); requestAnimationFrame(ctaLoop);
+})();
+
+// SCROLL REVEAL
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.transition='opacity 0.8s ease, transform 0.8s ease';
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+    }
+  });
+},{threshold:0.15});
+document.querySelectorAll('.rule-card, .step').forEach(el=>{
+  el.style.opacity='0'; el.style.transform='translateY(24px)'; observer.observe(el);
+});
+</script>
 </body>
 </html>
